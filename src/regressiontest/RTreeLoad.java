@@ -1,10 +1,5 @@
 // NOTE: Please read README.txt before browsing this code.
 package regressiontest;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.LineNumberReader;
-import java.util.StringTokenizer;
-
 import spatialindex.rtree.RTree;
 import spatialindex.spatialindex.IData;
 import spatialindex.spatialindex.INode;
@@ -18,10 +13,16 @@ import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
 import spatialindex.storagemanager.RandomEvictionsBuffer;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.LineNumberReader;
+import java.util.StringTokenizer;
+
 public class RTreeLoad
 {
 	public static void main(String[] args)
 	{
+		System.out.println("Load Start!!");
 		new RTreeLoad(args);
 	}
 	
