@@ -29,12 +29,14 @@
 
 package spatialindex.storagemanager;
 
-public interface IStorageManager
-{
-	public static final int NewPage = -1;
-
-	public void flush();
-	public byte[] loadByteArray(final int id);
-	public int storeByteArray(final int id, final byte[] data);
-	public void deleteByteArray(final int id);
+public interface IStorageManager {
+	int NewPage = -1;
+	//将数据刷新到磁盘，只有DiskStorgeManager才有用到
+	void flush();
+	//给定一个索引ID，查询出存储内容
+	byte[] loadByteArray(final int id);
+	// 给定索引ID存储数据
+	int storeByteArray(final int id, final byte[] data);
+	//删除指定ID的数据
+	void deleteByteArray(final int id);
 } // IStorageManager

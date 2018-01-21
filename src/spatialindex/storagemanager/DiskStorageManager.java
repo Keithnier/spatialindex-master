@@ -40,19 +40,22 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-public class DiskStorageManager implements IStorageManager
-{
-	private RandomAccessFile m_dataFile = null;
+//按页存储数据
+public class DiskStorageManager implements IStorageManager {
 	private RandomAccessFile m_indexFile = null;
+
+	//用于存储数据的RandomAccessFile
+	private RandomAccessFile m_dataFile = null;
+	//页大小
 	private int m_pageSize = 0;
 	private int m_nextPage = -1;
+	//回收的内存快
 	private TreeSet m_emptyPages = new TreeSet();
-	private HashMap m_pageIndex = new HashMap();
+	//存储 页索引号信息
+	private Map<Integer, Entry> m_pageIndex = new HashMap<>();
 	private byte[] m_buffer = null;
 
-	public DiskStorageManager(PropertySet ps)
-		throws SecurityException, NullPointerException, IOException, FileNotFoundException, IllegalArgumentException
-	{
+	public DiskStorageManager(PropertySet ps) throws SecurityException, NullPointerException, IOException, FileNotFoundException, IllegalArgumentException {
 		Object var;
 
 		// Open/Create flag.
@@ -180,10 +183,8 @@ public class DiskStorageManager implements IStorageManager
 		}
 	}
 
-	public void flush()
-	{
-		try
-		{
+	public void flush() {
+		try {
 			m_indexFile.seek(0l);
 
 			m_indexFile.writeInt(m_pageSize);
@@ -232,169 +233,123 @@ public class DiskStorageManager implements IStorageManager
 		}
 	}
 
-	public byte[] loadByteArray(final int id)
-	{
+	public byte[] loadByteArray(final int id) {
+		//从hashMap中获取索引信息
 		Entry e = (Entry) m_pageIndex.get(new Integer(id));
 		if (e == null) throw new InvalidPageException(id);
-
 		int cNext = 0;
 		int cTotal = e.m_pages.size();
-
 		byte[] data = new byte[e.m_length];
 		int cIndex = 0;
 		int cLen;
 		int cRem = e.m_length;
-
-		do
-		{
-			try
-			{
+		do {
+			try {
+				//根据连续的页索引号，去存储文件中读取数据，然后放到data数组中，最后返回data
 				m_dataFile.seek(((Integer) e.m_pages.get(cNext)).intValue() * m_pageSize);
 				int bytesread = m_dataFile.read(m_buffer);
 				if (bytesread != m_pageSize) throw new IllegalStateException("Corrupted data file.");
-			}
-			catch (IOException ex)
-			{
+			} catch (IOException ex) {
 				throw new IllegalStateException("Corrupted data file.");
 			}
-
 			cLen = (cRem > m_pageSize) ? m_pageSize : cRem;
 			System.arraycopy(m_buffer, 0, data, cIndex, cLen);
 
 			cIndex += cLen;
 			cRem -= cLen;
 			cNext++;
-		}
-		while (cNext < cTotal);
-
+		} while (cNext < cTotal);
 		return data;
 	}
 
-	public int storeByteArray(final int id, final byte[] data)
-	{
-		if (id == NewPage)
-		{
+	public int storeByteArray(final int id, final byte[] data) {
+		//插入新数据
+		if (id == NewPage) {
 			Entry e = new Entry();
 			e.m_length = data.length;
-
 			int cIndex = 0;
 			int cPage;
 			int cRem = data.length;
 			int cLen;
-
-			while (cRem > 0)
-			{
-				if (! m_emptyPages.isEmpty())
-				{
+			while (cRem > 0) {
+				//看是否有空页，有则利用，省去重新申请空间的代价；没有则用新空间
+				if (! m_emptyPages.isEmpty()) {
 					Integer i = (Integer) m_emptyPages.first();
 					m_emptyPages.remove(i);
 					cPage = i.intValue();
-				}
-				else
-				{
+				} else {
 					cPage = m_nextPage;
 					m_nextPage++;
 				}
-
 				cLen = (cRem > m_pageSize) ? m_pageSize : cRem;
 				System.arraycopy(data, cIndex, m_buffer, 0, cLen);
-
-				try
-				{
+				try {
+					//定位存储指针位，写数据
 					m_dataFile.seek(cPage * m_pageSize);
 					m_dataFile.write(m_buffer);
-				}
-				catch (IOException ex)
-				{
+				} catch (IOException ex) {
 					throw new IllegalStateException("Corrupted data file.");
 				}
-
 				cIndex += cLen;
 				cRem -= cLen;
 				e.m_pages.add(new Integer(cPage));
 			}
-
 			Integer i = (Integer) e.m_pages.get(0);
 			m_pageIndex.put(i, e);
-
 			return i.intValue();
-		}
-		else
-		{
-			// find the entry.
-			Entry oldEntry = (Entry) m_pageIndex.get(new Integer(id));
+		} else {
+			//更新数据
+			Entry oldEntry = (Entry) m_pageIndex.get(new Integer(id));// find the entry.
 			if (oldEntry == null) throw new InvalidPageException(id);
-
 			m_pageIndex.remove(new Integer(id));
-
 			Entry e = new Entry();
 			e.m_length = data.length;
-
 			int cIndex = 0;
 			int cPage;
 			int cRem = data.length;
 			int cLen, cNext = 0;
-
-			while (cRem > 0)
-			{
-				if (cNext < oldEntry.m_pages.size())
-				{
+			while (cRem > 0) {
+				if (cNext < oldEntry.m_pages.size()) {
 					cPage = ((Integer) oldEntry.m_pages.get(cNext)).intValue();
 					cNext++;
-				}
-				else if (! m_emptyPages.isEmpty())
-				{
+				} else if (! m_emptyPages.isEmpty()) {
 					Integer i = (Integer) m_emptyPages.first();
 					m_emptyPages.remove(i);
 					cPage = i.intValue();
-				}
-				else
-				{
+				} else {
 					cPage = m_nextPage;
 					m_nextPage++;
 				}
-
 				cLen = (cRem > m_pageSize) ? m_pageSize : cRem;
 				System.arraycopy(data, cIndex, m_buffer, 0, cLen);
-
-				try
-				{
+				try {
 					m_dataFile.seek(cPage * m_pageSize);
 					m_dataFile.write(m_buffer);
-				}
-				catch (IOException ex)
-				{
+				} catch (IOException ex) {
 					throw new IllegalStateException("Corrupted data file.");
 				}
-
 				cIndex += cLen;
 				cRem -= cLen;
 				e.m_pages.add(new Integer(cPage));
 			}
-
-			while (cNext < oldEntry.m_pages.size())
-			{
+			while (cNext < oldEntry.m_pages.size()) {
 				m_emptyPages.add(oldEntry.m_pages.get(cNext));
 				cNext++;
 			}
-
 			Integer i = (Integer) e.m_pages.get(0);
 			m_pageIndex.put(i, e);
-
 			return i.intValue();
 		}
 	}
 
-	public void deleteByteArray(final int id)
-	{
+	public void deleteByteArray(final int id) {
 		// find the entry.
 		Entry e = (Entry) m_pageIndex.get(new Integer(id));
 		if (e == null) throw new InvalidPageException(id);
-
+		// 删除索引
 		m_pageIndex.remove(new Integer(id));
-
-		for (int cIndex = 0; cIndex < e.m_pages.size(); cIndex++)
-		{
+		// 将所有的页都加到emptyPage中利用起来
+		for (int cIndex = 0; cIndex < e.m_pages.size(); cIndex++) {
 			m_emptyPages.add(e.m_pages.get(cIndex));
 		}
 	}
@@ -404,8 +359,7 @@ public class DiskStorageManager implements IStorageManager
 		flush();
 	}
 
-	class Entry
-	{
+	class Entry {
 		int m_length = 0;
 		ArrayList m_pages = new ArrayList();
 	}

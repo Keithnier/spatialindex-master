@@ -128,29 +128,9 @@ public class RTreeLoad
 
 					f1[0] = x1; f1[1] = y1;
 					f2[0] = x2; f2[1] = y2;
-					Region r = new Region(f1, f2);
-
+					Region r = new Region(new double[] {1, 1}, new double[]{2, 10});
 					String data = r.toString();
-						// associate some data with this region. I will use a string that represents the
-						// region itself, as an example.
-						// NOTE: It is not necessary to associate any data here. A null pointer can be used. In that
-						// case you should store the data externally. The index will provide the data IDs of
-						// the answers to any query, which can be used to access the actual data from the external
-						// storage (e.g. a hash table or a database table, etc.).
-						// Storing the data in the index is convinient and in case a clustered storage manager is
-						// provided (one that stores any node in consecutive pages) performance will improve substantially,
-						// since disk accesses will be mostly sequential. On the other hand, the index will need to
-						// manipulate the data, resulting in larger overhead. If you use a main memory storage manager,
-						// storing the data externally is highly recommended (clustering has no effect).
-						// A clustered storage manager is NOT provided yet.
-						// Also you will have to take care of converting you data to and from binary format, since only
-						// array of bytes can be inserted in the index (see RTree::Node::load and RTree::Node::store for
-						// an example of how to do that).
-
-					//tree.insertData(data.getBytes(), r, id);
-
-					tree.insertData(null, r, id);
-						// example of passing a null pointer as the associated data.
+					tree.insertData(data.getBytes(), r, id);
 				}
 				else if (op == 2)
 				{
@@ -169,7 +149,7 @@ public class RTreeLoad
 					}
 					else if (args[3].equals("10NN"))
 					{
-						Point p = new Point(f1);
+						Point p = new Point(new double[]{92, 0210});
 						tree.nearestNeighborQuery(10, p, vis);
 							// this will find the 10 nearest neighbors.
 					}

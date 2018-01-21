@@ -34,44 +34,34 @@ import java.io.*;
 
 import spatialindex.spatialindex.*;
 
-abstract class Node implements INode
-{
+abstract class Node implements INode {
 	protected RTree m_pTree = null;
 		// Parent of all nodes.
 
+	//节点的高度 The level of the node in the tree，Leaves are always at level 0.
 	protected int m_level = -1;
-		// The level of the node in the tree.
-		// Leaves are always at level 0.
-
+	// 唯一主键： The unique ID of this node.
 	protected int m_identifier = -1;
-		// The unique ID of this node.
-
+	//子节点数目 ：The number of children pointed by this node.
 	protected int m_children = 0;
-		// The number of children pointed by this node.
-
+	//容量（一个节点可以承载多少子节点） ：Specifies the node capacity.
 	protected int m_capacity = -1;
-		// Specifies the node capacity.
-
+	// MBR :The minimum bounding region enclosing all data contained in the node.
 	protected Region m_nodeMBR = null;
-		// The minimum bounding region enclosing all data contained in the node.
-
+	// 存储在此节点的数据：The data stored in the node.
 	protected byte[][] m_pData = null;
-		// The data stored in the node.
-
+	// 子节点的MBR信息: The corresponding data MBRs.
 	protected Region[] m_pMBR = null;
-		// The corresponding data MBRs.
-
+	//每个子节点的标识号： The corresponding data identifiers.
 	protected int[] m_pIdentifier = null;
-		// The corresponding data identifiers.
-
+	//每个子节点的数据长度
 	protected int[] m_pDataLength = null;
-
+	//总的数据长度
 	int m_totalDataLength = 0;
 
 	//
 	// Abstract methods
 	//
-
 	protected abstract Node chooseSubtree(Region mbr, int level, Stack pathBuffer);
 	protected abstract Leaf findLeaf(Region mbr, int id, Stack pathBuffer);
 	protected abstract Node[] split(byte[] pData, Region mbr, int id);
@@ -149,15 +139,12 @@ abstract class Node implements INode
 	protected void insertEntry(byte[] pData, Region mbr, int id) throws IllegalStateException
 	{
 		if (m_children >= m_capacity) throw new IllegalStateException("m_children >= m_nodeCapacity");
-
 		m_pDataLength[m_children] = (pData != null) ? pData.length : 0;
 		m_pData[m_children] = pData;
 		m_pMBR[m_children] = mbr;
 		m_pIdentifier[m_children] = id;
-
 		m_totalDataLength += m_pDataLength[m_children];
 		m_children++;
-
 		Region.combinedRegion(m_nodeMBR, mbr);
 	}
 
@@ -202,36 +189,31 @@ abstract class Node implements INode
 		}
 	}
 
-	protected boolean insertData(byte[] pData, Region mbr, int id, Stack pathBuffer, boolean[] overflowTable)
-	{
-		if (m_children < m_capacity)
-		{
+	protected boolean insertData(byte[] pData, Region mbr, int id, Stack pathBuffer, boolean[] overflowTable) {
+        //节点还没满
+	    if (m_children < m_capacity) {
 			boolean adjusted = false;
 			boolean b = m_nodeMBR.contains(mbr);
-
+			//插入节点
 			insertEntry(pData, mbr, id);
 			m_pTree.writeNode(this);
-
-			if (! b && ! pathBuffer.empty())
-			{
+			//调整父节点信息：重新计算MBR。插入节点后，父节点的MBR会被撑大
+			if (! b && ! pathBuffer.empty()) {
 				int cParent = ((Integer) pathBuffer.pop()).intValue();
 				Index p = (Index) m_pTree.readNode(cParent);
 				p.adjustTree(this, pathBuffer);
 				adjusted = true;
 			}
-
 			return adjusted;
-		}
-		else if (m_pTree.m_treeVariant == SpatialIndex.RtreeVariantRstar && ! pathBuffer.empty() && overflowTable[m_level] == false)
-		{
+
+		//如果节点已经满了，并且是R*-tree
+		} else if (m_pTree.m_treeVariant == SpatialIndex.RtreeVariantRstar && ! pathBuffer.empty() && overflowTable[m_level] == false) {
 			overflowTable[m_level] = true;
-
 			ArrayList vReinsert = new ArrayList(), vKeep = new ArrayList();
+			//计算哪些需要重插入，哪些需要保留
 			reinsertData(pData, mbr, id, vReinsert, vKeep);
-
 			int lReinsert = vReinsert.size();
 			int lKeep = vKeep.size();
-
 			byte[][] reinsertdata = new byte[lReinsert][];
 			Region[] reinsertmbr = new Region[lReinsert];
 			int[] reinsertid = new int[lReinsert];
@@ -240,27 +222,21 @@ abstract class Node implements INode
 			Region[] keepmbr = new Region[m_capacity + 1];
 			int[] keepid = new int[m_capacity + 1];
 			int[] keeplen = new int[m_capacity + 1];
-
 			int cIndex;
-
-			for (cIndex = 0; cIndex < lReinsert; cIndex++)
-			{
+			for (cIndex = 0; cIndex < lReinsert; cIndex++) {
 				int i = ((Integer) vReinsert.get(cIndex)).intValue();
 				reinsertlen[cIndex] = m_pDataLength[i];
 				reinsertdata[cIndex] = m_pData[i];
 				reinsertmbr[cIndex] = m_pMBR[i];
 				reinsertid[cIndex] = m_pIdentifier[i];
 			}
-
-			for (cIndex = 0; cIndex < lKeep; cIndex++)
-			{
+			for (cIndex = 0; cIndex < lKeep; cIndex++) {
 				int i = ((Integer) vKeep.get(cIndex)).intValue();
 				keeplen[cIndex] = m_pDataLength[i];
 				keepdata[cIndex] = m_pData[i];
 				keepmbr[cIndex] = m_pMBR[i];
 				keepid[cIndex] = m_pIdentifier[i];
 			}
-
 			m_pDataLength = keeplen;
 			m_pData = keepdata;
 			m_pMBR = keepmbr;
@@ -268,40 +244,27 @@ abstract class Node implements INode
 			m_children = lKeep;
 			m_totalDataLength = 0;
 			for (int cChild = 0; cChild < m_children; cChild++) m_totalDataLength += m_pDataLength[cChild];
-
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
-			{
+			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++) {
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
-
-				for (int cChild = 0; cChild < m_children; cChild++)
-				{
+				for (int cChild = 0; cChild < m_children; cChild++) {
 					m_nodeMBR.m_pLow[cDim] = Math.min(m_nodeMBR.m_pLow[cDim], m_pMBR[cChild].m_pLow[cDim]);
 					m_nodeMBR.m_pHigh[cDim] = Math.max(m_nodeMBR.m_pHigh[cDim], m_pMBR[cChild].m_pHigh[cDim]);
 				}
 			}
-
 			m_pTree.writeNode(this);
-
 			// Divertion from R*-Tree algorithm here. First adjust
 			// the path to the root, then start reinserts, to avoid complicated handling
 			// of changes to the same node from multiple insertions.
 			int cParent = ((Integer) pathBuffer.pop()).intValue();
 			Index p = (Index) m_pTree.readNode(cParent);
 			p.adjustTree(this, pathBuffer);
-
-			for (cIndex = 0; cIndex < lReinsert; cIndex++)
-			{
-				m_pTree.insertData_impl(reinsertdata[cIndex],
-																reinsertmbr[cIndex],
-																reinsertid[cIndex],
-																m_level, overflowTable);
+			for (cIndex = 0; cIndex < lReinsert; cIndex++) {
+				m_pTree.insertData_impl(reinsertdata[cIndex], reinsertmbr[cIndex], reinsertid[cIndex], m_level, overflowTable);
 			}
-
 			return true;
 		}
-		else
-		{
+		else {
 			Node[] nodes = split(pData, mbr, id);
 			Node n = nodes[0];
 			Node nn = nodes[1];
@@ -836,8 +799,7 @@ abstract class Node implements INode
 		}
 	}
 
-	protected void load(byte[] data) throws IOException
-	{
+	protected void load(byte[] data) throws IOException{
 		m_nodeMBR = (Region) m_pTree.m_infiniteRegion.clone();
 
 		DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));

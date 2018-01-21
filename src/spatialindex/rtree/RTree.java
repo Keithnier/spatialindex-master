@@ -58,38 +58,40 @@ import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.InvalidPageException;
 import spatialindex.storagemanager.PropertySet;
 
-public class RTree implements ISpatialIndex
-{
+public class RTree implements ISpatialIndex {
 	RWLock m_rwLock;
 
+	//存储管理器，一般有将节点信息存储在内存(MemoryStorageManager)和磁盘(DiskStorageManager)两种
 	IStorageManager m_pStorageManager;
-
+	// 根节点存储ID
 	int m_rootID;
+	// Rtree树头（用来存储Rtree的一些配置信息，比如填充因子等）的存储ID
 	int m_headerID;
-
+    // Rtree的类型，整个源码里有三种Rtree的变种：（RtreeVariantQuadratic，RtreeVariantLinear，RtreeVariantRstar）
+    // 我们这里主要讲R*tree
 	int m_treeVariant;
-
+	// 树的填充因子
 	double m_fillFactor;
-
+	//索引节点的容量
 	int m_indexCapacity;
-
+	//叶子节点的容量
 	int m_leafCapacity;
-
+	// R*-Tree中, 用于插入时寻找最合适的子节点用到参数
 	int m_nearMinimumOverlapFactor;
 		// The R*-Tree 'p' constant, for calculating nearly minimum overlap cost.
 		// [Beckmann, Kriegel, Schneider, Seeger 'The R*-tree: An efficient and Robust Access Method
 		// for Points and Rectangles, Section 4.1]
-
+    // 节点分裂时，用到的参数
 	double m_splitDistributionFactor;
 		// The R*-Tree 'm' constant, for calculating spliting distributions.
 		// [Beckmann, Kriegel, Schneider, Seeger 'The R*-tree: An efficient and Robust Access Method
 		// for Points and Rectangles, Section 4.2]
-
+    // R*-tree，重插入因子，是R*-tree的优化，用于在插入时，节点容量已经满时，进行重插入优化
 	double m_reinsertFactor;
 		// The R*-Tree 'p' constant, for removing entries at reinserts.
 		// [Beckmann, Kriegel, Schneider, Seeger 'The R*-tree: An efficient and Robust Access Method
 		//  for Points and Rectangles, Section 4.3]
-
+    //维度，一般是二维
 	int m_dimension;
 
 	Region m_infiniteRegion;
@@ -100,8 +102,7 @@ public class RTree implements ISpatialIndex
 	ArrayList m_readNodeCommands = new ArrayList();
 	ArrayList m_deleteNodeCommands = new ArrayList();
 
-	public RTree(PropertySet ps, IStorageManager sm)
-	{
+	public RTree(PropertySet ps, IStorageManager sm) {
 		m_rwLock = new RWLock();
 		m_pStorageManager = sm;
 		m_rootID = IStorageManager.NewPage;
@@ -153,20 +154,14 @@ public class RTree implements ISpatialIndex
 	// ISpatialIndex interface
 	//
 
-	public void insertData(final byte[] data, final IShape shape, int id)
-	{
+	public void insertData(final byte[] data, final IShape shape, int id) {
 		if (shape.getDimension() != m_dimension) throw new IllegalArgumentException("insertData: Shape has the wrong number of dimensions.");
-
 		m_rwLock.write_lock();
-
 		try
 		{
 			Region mbr = shape.getMBR();
-
 			byte[] buffer = null;
-
-			if (data != null && data.length > 0)
-			{
+			if (data != null && data.length > 0) {
 				buffer = new byte[data.length];
 				System.arraycopy(data, 0, buffer, 0, data.length);
 			}
@@ -230,71 +225,54 @@ public class RTree implements ISpatialIndex
 		rangeQuery(SpatialIndex.IntersectionQuery, r, v);
 	}
 
-	public void nearestNeighborQuery(int k, final IShape query, final IVisitor v, final INearestNeighborComparator nnc)
-	{
+	public void nearestNeighborQuery(int k, final IShape query, final IVisitor v, final INearestNeighborComparator nnc) {
 		if (query.getDimension() != m_dimension) throw new IllegalArgumentException("nearestNeighborQuery: Shape has the wrong number of dimensions.");
-
 		m_rwLock.read_lock();
 
-		try
-		{
+		try {
 			// I need a priority queue here. It turns out that TreeSet sorts unique keys only and since I am
 			// sorting according to distances, it is not assured that all distances will be unique. TreeMap
 			// also sorts unique keys. Thus, I am simulating a priority queue using an ArrayList and binarySearch.
 			ArrayList queue = new ArrayList();
-
+			//加载节点
 			Node n = readNode(m_rootID);
 			queue.add(new NNEntry(n, 0.0));
-
 			int count = 0;
 			double knearest = 0.0;
-
-			while (queue.size() != 0)
-			{
+			while (queue.size() != 0) {
 				NNEntry first = (NNEntry) queue.remove(0);
-
-				if (first.m_pEntry instanceof Node)
-				{
+				if (first.m_pEntry instanceof Node) {
 					n = (Node) first.m_pEntry;
 					v.visitNode((INode) n);
-
-					for (int cChild = 0; cChild < n.m_children; cChild++)
-					{
+					for (int cChild = 0; cChild < n.m_children; cChild++) {
 						IEntry e;
-
-						if (n.m_level == 0)
-						{
+						if (n.m_level == 0) {
+						    //数据
 							e = new Data(n.m_pData[cChild], n.m_pMBR[cChild], n.m_pIdentifier[cChild]);
-						}
-						else
-						{
+						} else {
+						    //索引节点
 							e = (IEntry) readNode(n.m_pIdentifier[cChild]);
 						}
-
+                        // ⭐️⭐️ 以查询点到e的最近距离为标准来决定访问顺序
 						NNEntry e2 = new NNEntry(e, nnc.getMinimumDistance(query, e));
-
 						// Why don't I use a TreeSet here? See comment above...
 						int loc = Collections.binarySearch(queue, e2, new NNEntryComparator());
 						if (loc >= 0) queue.add(loc, e2);
 						else queue.add((-loc - 1), e2);
 					}
-				}
-				else
-				{
+				} else {
 					// report all nearest neighbors with equal furthest distances.
 					// (neighbors can be more than k, if many happen to have the same
 					//  furthest distance).
+                    //达到第k时，停止查询
 					if (count >= k && first.m_minDist > knearest) break;
-
 					v.visitData((IData) first.m_pEntry);
 					m_stats.m_queryResults++;
 					count++;
 					knearest = first.m_minDist;
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			m_rwLock.read_unlock();
 		}
 	}
@@ -781,22 +759,18 @@ public class RTree implements ISpatialIndex
 		}
 	}
 
-	protected void insertData_impl(byte[] pData, Region mbr, int id)
-	{
+	protected void insertData_impl(byte[] pData, Region mbr, int id) {
 		assert mbr.getDimension() == m_dimension;
-
 		boolean[] overflowTable;
-
 		Stack pathBuffer = new Stack();
-
+		//通过根节点的ID去加载节点信息
 		Node root = readNode(m_rootID);
-
 		overflowTable = new boolean[root.m_level];
 		for (int cLevel = 0; cLevel < root.m_level; cLevel++) overflowTable[cLevel] = false;
 
+		//选择一个最合适的节点插入数据！怎么算最合适：比如：最小扩大面积等
 		Node l = root.chooseSubtree(mbr, 0, pathBuffer);
 		l.insertData(pData, mbr, id, pathBuffer, overflowTable);
-
 		m_stats.m_data++;
 	}
 
@@ -805,7 +779,7 @@ public class RTree implements ISpatialIndex
 		assert mbr.getDimension() == m_dimension;
 
 		Stack pathBuffer = new Stack();
-
+        //加载数据
 		Node root = readNode(m_rootID);
 		Node n = root.chooseSubtree(mbr, level, pathBuffer);
 		n.insertData(pData, mbr, id, pathBuffer, overflowTable);
@@ -878,27 +852,29 @@ public class RTree implements ISpatialIndex
 		return page;
 	}
 
-	protected Node readNode(int id)
-	{
+	protected Node readNode(int id) {
 		byte[] buffer;
 		DataInputStream ds = null;
 		int nodeType = -1;
 		Node n = null;
-
 		try
 		{
+		    //从storageManager中加载数据
 			buffer = m_pStorageManager.loadByteArray(id);
 			ds = new DataInputStream(new ByteArrayInputStream(buffer));
+			//加载节点类型(叶子节点还是索引节点？)
 			nodeType = ds.readInt();
-
-			if (nodeType == SpatialIndex.PersistentIndex) n = new Index(this, -1, 0);
-			else if (nodeType == SpatialIndex.PersistentLeaf) n = new Leaf(this, -1);
+			//根据nodeType实例化节点类型
+			if (nodeType == SpatialIndex.PersistentIndex)
+			    n = new Index(this, -1, 0);
+			else if (nodeType == SpatialIndex.PersistentLeaf)
+			    n = new Leaf(this, -1);
 			else throw new IllegalStateException("readNode failed reading the correct node type information");
-
 			n.m_pTree = this;
 			n.m_identifier = id;
-			n.load(buffer);
-
+			//继续根据存储的信息，设置节点信息，其实是根据存储的byte[]反序列化
+            //节点初始化数据 见Node.load(byte[] data) 反序列化过程
+            n.load(buffer);
 			m_stats.m_reads++;
 		}
 		catch (InvalidPageException e)

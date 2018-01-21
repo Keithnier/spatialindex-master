@@ -248,8 +248,7 @@ public class Index extends Node
 		return entries[best].m_id;
 	}
 
-	protected void adjustTree(Node n, Stack pathBuffer)
-	{
+	protected void adjustTree(Node n, Stack pathBuffer) {
 		m_pTree.m_stats.m_adjustments++;
 
 		// find entry pointing to old node;
