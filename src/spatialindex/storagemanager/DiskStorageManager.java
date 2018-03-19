@@ -40,6 +40,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
+/**
+ * 磁盘存储管理器使用两个随机访问文件来存储信息。
+ * 一个扩展名为.idx，另一个扩展名为.dat
+ */
 public class DiskStorageManager implements IStorageManager
 {
 	private RandomAccessFile m_dataFile = null;

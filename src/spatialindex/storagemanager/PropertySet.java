@@ -31,6 +31,12 @@ package spatialindex.storagemanager;
 
 import java.util.HashMap;
 
+/**
+ * 公共初始化类，为库中所有对象提供公共构造函数和统一初始化，将字符串和对象一一关联，每个属性对应一个字符串
+ * 功能：
+ * 1、getProperty返回与给定字符串关联的Object
+ * 2、setProperty将给定的Object与给定的字符串关联（保存Object的引用，不发生克隆）
+ */
 public class PropertySet
 {
 	private HashMap m_propertySet = new HashMap();

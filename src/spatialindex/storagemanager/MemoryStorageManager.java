@@ -32,6 +32,10 @@ package spatialindex.storagemanager;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * 由于它暗示着名称，这是一个主要的内存实现。一切都使用简单的向量存储在主存中。
+ * 没有属性需要初始化MemoryStorageManager对象。当MemoryStorageManager实例超出作用域时，它所包含的所有数据都将丢失。
+ */
 public class MemoryStorageManager implements IStorageManager
 {
 	private ArrayList m_buffer = new ArrayList();

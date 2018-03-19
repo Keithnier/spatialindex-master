@@ -29,6 +29,9 @@
 
 package spatialindex.spatialindex;
 
+/**
+ * 所有形状类应该扩展IShape。基本区域和点类已经提供。请查看Region.java和Point.java以获取更多详细信息。
+ */
 public interface IShape
 {
 	public boolean intersects(final IShape s);
