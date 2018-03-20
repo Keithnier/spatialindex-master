@@ -3,12 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 class NNEntry
 {
@@ -22,21 +17,28 @@ public class Exhaustive
 {
 	public static void main(String[] args)
 	{
-		if (args.length != 2)
+		System.out.println("请输入data_file和query_type:");
+		Scanner in = new Scanner(System.in);
+		String input = in.nextLine();
+		String [] inputList = input.split(" ");
+		if (inputList.length != 2)
 		{
 			System.err.println("Usage: Exhaustive data_file query_type [intersection | 10NN].");
 			System.exit(-1);
 		}
 
+		String data_file = inputList[0];
+		String query_type = inputList[1];
+
 		LineNumberReader lr = null;
 
 		try
 		{
-			lr = new LineNumberReader(new FileReader(args[0]));
+			lr = new LineNumberReader(new FileReader(data_file));
 		}
 		catch (FileNotFoundException e)
 		{
-			System.err.println("Cannot open data file" + args[0] + ".");
+			System.err.println("Cannot open data file" + data_file + ".");
 			System.exit(-1);
 		}
 
