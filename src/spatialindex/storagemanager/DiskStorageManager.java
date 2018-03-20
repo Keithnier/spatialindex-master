@@ -43,6 +43,11 @@ import java.util.TreeSet;
 /**
  * 磁盘存储管理器使用两个随机访问文件来存储信息。
  * 一个扩展名为.idx，另一个扩展名为.dat
+ * .idx文件的目的是存储重要信息，如页面大小，下一个可用页面，空白页面列表以及与每个实体ID关联的页面序列。
+ * 该类还提供了一种实际上覆盖.idx文件并同步两个文件指针的刷新方法。
+ * .idx文件在初始化过程中被加载到主内存中，并且仅在刷新存储管理器或对象完成期间写入磁盘。
+ * 如果发生意外故障，存储管理器的更改将由于.idx文件过时而丢失。避免这种灾难是未来的工作。
+ * 重要提示：请记住在处理索引之前调用ISpatialIndex.flush（），因为在JVM退出时不会发生一些终止事件。
  */
 public class DiskStorageManager implements IStorageManager
 {
@@ -54,6 +59,15 @@ public class DiskStorageManager implements IStorageManager
 	private HashMap m_pageIndex = new HashMap();
 	private byte[] m_buffer = null;
 
+
+	/**
+	 * FileName	String
+	 * 要打开的文件的基本名称（无扩展名）
+   * Overwrite	Boolean
+   * 如果覆盖为真，并且具有指定文件名的存储管理器已存在，则它将被截断并被覆盖。所有数据都将丢失
+ 	* PageSize	Integer
+	 * 要使用的页面大小。如果指定的文件名已经存在并且Overwrite为false，则忽略PageSize
+	 */
 	public DiskStorageManager(PropertySet ps)
 		throws SecurityException, NullPointerException, IOException, FileNotFoundException, IllegalArgumentException
 	{

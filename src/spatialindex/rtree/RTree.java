@@ -58,6 +58,22 @@ import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.InvalidPageException;
 import spatialindex.storagemanager.PropertySet;
 
+/**
+ * RTree索引是一个平衡树结构，由索引节点，叶节点和数据组成。
+ * 每个节点（树叶和索引）具有固定容量的条目，（索引创建时选择的节点容量）RTree根据叶节点中的各种启发式将它们的最小边界区域（MBR）抽象化并对这些MBR进行聚类。
+ * 查询从树下的树根开始评估。
+ * 由于索引是平衡的，节点可以处于满载状态。他们不能为空。填充因子指定任何节点中允许的最小条目数。填充因子通常接近70％
+ *
+ * RTree的创建包括：
+  1.确定索引是内部存储器还是外部存储器，并选择适当的存储管理器。
+  2.选择索引和叶子容量（也称为扇出）。
+  3.选择填充因子（从节点容量的1％到99％）。
+  4.选择数据的维度。
+  5.选择插入/更新策略（RTree变体）。
+
+ * 如果已经存储的RTree被重新加载以供重用，则只需要在构建期间提供索引ID。
+ * 在这种情况下，一些选项不能被修改。这些包括：索引和叶子容量，填充因子和维度。请注意，RTree变体实际上可以修改。该变体仅影响分裂发生的时间和方式，因此可以随时更改。
+ */
 public class RTree implements ISpatialIndex
 {
 	RWLock m_rwLock;
@@ -100,6 +116,27 @@ public class RTree implements ISpatialIndex
 	ArrayList m_readNodeCommands = new ArrayList();
 	ArrayList m_deleteNodeCommands = new ArrayList();
 
+	/**
+	 *  初始化PropertySet用于设置上述选项，符合以下属性字符串：
+	 * 1. IndexIndentifier	Integer
+	 *	如果指定，则将使用给定的索引ID从提供的存储管理器打开现有的索引。 如果索引ID或存储管理器不正确，则行为未指定。
+	 *	2.	Dimension	Integer
+	 *	将被插入的数据的维度。
+	 *	3. IndexCapacity	Integer
+	 *	索引节点的容量。默认值是100
+	 * 4. LeafCapactiy	Integer
+	 *  叶节点容量。默认值是100
+	 * 5. FillFactor Double
+	 *  填充因子。默认值是70％
+	 * 6. TreeVariant Integer
+	 *  可以是Linear，Quadratic或Rstar之一。默认是Rstar
+	 * 7. NearMinimumOverlapFactor	Integer
+	 *  缺省值是32
+	 * 8. SplitDistributionFactor Double
+	 *  默认值是0.4
+	 * 9. ReinsertFactor Double
+	 *  默认值为0.3
+	 */
 	public RTree(PropertySet ps, IStorageManager sm)
 	{
 		m_rwLock = new RWLock();

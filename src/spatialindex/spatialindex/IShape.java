@@ -41,5 +41,9 @@ public interface IShape
 	public long getDimension();
 	public Region getMBR();
 	public double getArea();
+
+	/**
+	 * 默认实现使用IShape的getMinimumDistance函数来计算查询与矩形节点和存储在树中的数据项之间的距离。
+	 */
 	public double getMinimumDistance(final IShape s);
 } // IShape

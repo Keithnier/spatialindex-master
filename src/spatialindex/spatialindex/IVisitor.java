@@ -26,6 +26,11 @@
 
 package spatialindex.spatialindex;
 
+/**
+ * 为了自定义查询，IVisitor接口（基于Visitor模式[gamma94]）为访问索引和叶节点以及数据条目提供回调函数。
+ * 节点和数据信息可以使用INode和IData接口获得（都扩展IEntry）。
+ * 使用这个接口的例子包括可视化查询，计算为特定查询访问的叶节点或索引节点的数量，在访问特定空间区域时抛出警报等。
+ */
 public interface IVisitor
 {
 	public void visitNode(final INode n);

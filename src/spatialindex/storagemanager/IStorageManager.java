@@ -53,20 +53,20 @@ public interface IStorageManager
 
 	public void flush();
 
-	/*
-	loadByteArray方法获取实体标识并返回关联的字节数组。如果请求了无效的ID，则会引发异常。
+	/**
+	 * loadByteArray方法获取实体标识并返回关联的字节数组。如果请求了无效的ID，则会引发异常。
 	 */
 	public byte[] loadByteArray(final int id);
 
-	/*
-	storeByteArray方法获取一个字节数组和一个实体ID。
-	如果调用者将NewPage指定为输入ID，则存储管理器将分配一个新ID，存储该实体并返回与该实体关联的ID。
-	相反，如果用户指定已存在的ID，则存储管理器将覆盖旧数据。 如果调用者请求覆盖无效ID，则会引发异常。
+	/**
+	 * storeByteArray方法获取一个字节数组和一个实体ID。
+	 * 如果调用者将NewPage指定为输入ID，则存储管理器将分配一个新ID，存储该实体并返回与该实体关联的ID。
+	 * 相反，如果用户指定已存在的ID，则存储管理器将覆盖旧数据。 如果调用者请求覆盖无效ID，则会引发异常。
 	 */
 	public int storeByteArray(final int id, final byte[] data);
 
-	/*
-	deleteByteArray方法从存储中删除请求的实体。
+	/**
+	 * deleteByteArray方法从存储中删除请求的实体。
 	 */
 	public void deleteByteArray(final int id);
 } // IStorageManager
