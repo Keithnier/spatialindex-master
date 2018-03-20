@@ -13,11 +13,14 @@ class NNEntry
 	NNEntry(int id, double dist) { m_id = id; m_dist = dist; }
 }
 
+/**
+ * data格式：op(0为删除1为插入2为查询) id x1 y1 x2 y2
+ */
 public class Exhaustive
 {
 	public static void main(String[] args)
 	{
-		System.out.println("请输入data_file和query_type:");
+		System.out.println("请输入data_file和query_type[intersection | 10NN]:");
 		Scanner in = new Scanner(System.in);
 		String input = in.nextLine();
 		String [] inputList = input.split(" ");
@@ -84,7 +87,7 @@ public class Exhaustive
 				x2 = new Float(st.nextToken()).floatValue();
 				y2 = new Float(st.nextToken()).floatValue();
 
-				if (args[1].equals("intersection"))
+				if (query_type.equals("intersection"))
 				{
 					MyRegion query = new MyRegion(x1, y1, x2, y2);
 					Iterator it = data.entrySet().iterator();
@@ -99,9 +102,9 @@ public class Exhaustive
 						}
 					}
 				}
-				else if (args[1].equals("10NN"))
+				else if (query_type.equals("10NN"))
 				{
-					MyRegion query = new MyRegion(x1, y1, x1, y1);
+					MyRegion query = new MyRegion(x1, y1, x2, y2);
 
 					// there is no priority queue implementation in Java. Even TreeSet or TreeMap require unique keys,
 					// and since I am sorting according to minDist, I need to be able to keep duplicate values.

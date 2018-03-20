@@ -18,6 +18,11 @@ class MyRegion
 		m_ymax = (y1 > y2) ? y1 : y2;
 	}
 
+	/**
+	 * 判断两个region是否相交
+	 * @param r
+	 * @return
+	 */
 	public boolean intersects(MyRegion r)
 	{
 		if (m_xmin > r.m_xmax || m_xmax < r.m_xmin ||
@@ -26,6 +31,11 @@ class MyRegion
 		return true;
 	}
 
+	/**
+	 * 计算两个region
+	 * @param r
+	 * @return
+	 */
 	public double getMinDist(final MyRegion r)
 	{
 		double ret = 0.0;
