@@ -29,34 +29,12 @@
 
 package spatialindex.rtree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Stack;
+import java.io.*;
+import java.util.*;
 
-import spatialindex.spatialindex.IData;
-import spatialindex.spatialindex.IEntry;
-import spatialindex.spatialindex.INearestNeighborComparator;
-import spatialindex.spatialindex.INode;
-import spatialindex.spatialindex.INodeCommand;
-import spatialindex.spatialindex.IQueryStrategy;
-import spatialindex.spatialindex.IShape;
-import spatialindex.spatialindex.ISpatialIndex;
-import spatialindex.spatialindex.IStatistics;
-import spatialindex.spatialindex.IVisitor;
-import spatialindex.spatialindex.Point;
-import spatialindex.spatialindex.RWLock;
-import spatialindex.spatialindex.Region;
-import spatialindex.spatialindex.SpatialIndex;
-import spatialindex.storagemanager.IStorageManager;
-import spatialindex.storagemanager.InvalidPageException;
-import spatialindex.storagemanager.PropertySet;
+import spatialindex.spatialindex.*;
+import spatialindex.storagemanager.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * RTree索引是一个平衡树结构，由索引节点，叶节点和数据组成。
@@ -1052,27 +1030,6 @@ public class RTree implements ISpatialIndex
 		return s;
 	}
 
-	class NNEntry
-	{
-		IEntry m_pEntry;
-		double m_minDist;
-
-		NNEntry(IEntry e, double f) { m_pEntry = e; m_minDist = f; }
-	}
-
-	class NNEntryComparator implements Comparator
-	{
-		public int compare(Object o1, Object o2)
-		{
-			NNEntry n1 = (NNEntry) o1;
-			NNEntry n2 = (NNEntry) o2;
-
-			if (n1.m_minDist < n2.m_minDist) return -1;
-			if (n1.m_minDist > n2.m_minDist) return 1;
-			return 0;
-		}
-	}
-
 	class NNComparator implements INearestNeighborComparator
 	{
 		public double getMinimumDistance(IShape query, IEntry e)
@@ -1090,21 +1047,102 @@ public class RTree implements ISpatialIndex
 		ValidateEntry(Region r, Node pNode) { m_parentMBR = r; m_pNode = pNode; }
 	}
 
-	class Data implements IData
-	{
-		int m_id;
-		Region m_shape;
-		byte[] m_pData;
-
-		Data(byte[] pData, Region mbr, int id) { m_id = id; m_shape = mbr; m_pData = pData; }
-
-		public int getIdentifier() { return m_id; }
-		public IShape getShape() { return new Region(m_shape); }
-		public byte[] getData()
+	public static void main(String[] args)throws Exception{
+		if (args.length != 4)
 		{
-			byte[] data = new byte[m_pData.length];
-			System.arraycopy(m_pData, 0, data, 0, m_pData.length);
-			return data;
+			System.err.println("Usage: RTree input_file tree_file fanout buffersize.");
+			System.exit(-1);
 		}
+
+		String inputfile = args[0];
+		String treefile = args[1];
+		int fanout = Integer.parseInt(args[2]);
+		int buffersize = Integer.parseInt(args[3]);
+
+
+		build(inputfile, treefile, fanout, buffersize);
+
+	}
+
+	public static void build(String inputfile, String treefile, int fanout, int buffersize)throws Exception{
+		FileInputStream fin = new FileInputStream(inputfile);
+		GZIPInputStream gzis = new GZIPInputStream(fin);
+		InputStreamReader xover = new InputStreamReader(gzis);
+		BufferedReader is = new BufferedReader(xover);
+		String line;
+		String[] temp;
+
+
+		// Create a disk based storage manager.
+		PropertySet ps = new PropertySet();
+
+		Boolean b = new Boolean(true);
+		ps.setProperty("Overwrite", b);
+		//overwrite the file if it exists.
+
+		ps.setProperty("FileName", treefile);
+		// .idx and .dat extensions will be added.
+
+		Integer i = new Integer(4096*fanout/100);
+		ps.setProperty("PageSize", i);
+		// specify the page size. Since the index may also contain user defined data
+		// there is no way to know how big a single node may become. The storage manager
+		// will use multiple pages per node if needed. Off course this will slow down performance.
+
+
+		IStorageManager diskfile = new DiskStorageManager(ps);
+
+		IBuffer file = new TreeLRUBuffer(diskfile, buffersize, false);
+		// applies a main memory random buffer on top of the persistent storage manager
+		// (LRU buffer, etc can be created the same way).
+
+		// Create a new, empty, RTree with dimensionality 2, minimum load 70%, using "file" as
+		// the StorageManager and the RSTAR splitting policy.
+
+		Double f = new Double(0.7);
+		ps.setProperty("FillFactor", f);
+
+		i = fanout;
+		ps.setProperty("IndexCapacity", i);
+		ps.setProperty("LeafCapacity", i);
+		// Index capacity and leaf capacity may be different.
+
+		i = new Integer(2);
+		ps.setProperty("Dimension", i);
+
+		RTree rtree = new RTree(ps, file);
+		int count = 0;
+		double[] f1 = new double[2];
+		double[] f2 = new double[2];
+		long start = System.currentTimeMillis();
+		while ( (line=is.readLine()) != null){
+			temp = line.split(",");
+			int id = Integer.parseInt(temp[0]);
+			float x = Float.parseFloat(temp[1]);
+			float y = Float.parseFloat(temp[2]);
+
+			f1[0] = f2[0] = x;
+			f1[1] = f2[1] = y;
+			Region r = new Region(f1, f2);
+
+			byte[] data = new byte[100];
+
+			rtree.insertData(data, r, id);
+
+			count++;
+			if(count % 10000 == 0) System.out.println(count);
+		}
+
+		long end = System.currentTimeMillis();
+
+		System.err.println(rtree);
+		System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
+
+		boolean ret = rtree.isIndexValid();
+		if (ret == false) System.err.println("Structure is INVALID!");
+
+		// flush all pending changes to persistent storage (needed since Java might not call finalize when JVM exits).
+		rtree.flush();
+
 	}
 }

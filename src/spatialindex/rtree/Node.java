@@ -46,6 +46,8 @@ abstract class Node implements INode
 	protected int m_identifier = -1;
 		// The unique ID of this node.
 
+	protected int numOfleaf = 0;
+
 	protected int m_children = 0;
 		// The number of children pointed by this node.
 
@@ -846,6 +848,7 @@ abstract class Node implements INode
 		ds.readInt();
 
 		m_level = ds.readInt();
+		numOfleaf = ds.readInt();
 		m_children = ds.readInt();
 
 		for (int cChild = 0; cChild < m_children; cChild++)
@@ -889,6 +892,7 @@ abstract class Node implements INode
 		ds.writeInt(type);
 
 		ds.writeInt(m_level);
+		ds.writeInt(numOfleaf);
 		ds.writeInt(m_children);
 
 		for (int cChild = 0; cChild < m_children; cChild++)
