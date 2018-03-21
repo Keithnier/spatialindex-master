@@ -2,6 +2,7 @@ package regressiontest;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Scanner;
 
 class MyRegion
 {
@@ -32,7 +33,7 @@ class MyRegion
 	}
 
 	/**
-	 * 计算两个region
+	 * 计算两个region的最小距离（有待改进）
 	 * @param r
 	 * @return
 	 */
@@ -54,11 +55,17 @@ class MyRegion
 	}
 }
 
+/**
+ * 构造测试数据，包括data的添加、删除
+ */
 public class Generator
 {
 	public static void main(String[] args)
 	{
-		if (args.length != 1)
+		System.out.println("请输入number_of_data:");
+		Scanner in = new Scanner(System.in);
+		String input = in.nextLine();
+		if (input.length() == 0)
 		{
 			System.err.println("Usage: Generator number_of_data.");
 			System.exit(-1);
@@ -66,7 +73,7 @@ public class Generator
 
 		Random rand = new Random();
 
-		int numberOfObjects = new Integer(args[0]).intValue();
+		int numberOfObjects = new Integer(input).intValue();
 		HashMap data = new HashMap(numberOfObjects);
 
 		for (int i = 0; i < numberOfObjects; i++)

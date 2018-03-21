@@ -16,6 +16,7 @@ import spatialindex.storagemanager.RandomEvictionsBuffer;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class RTreeLoad
@@ -23,14 +24,18 @@ public class RTreeLoad
 	public static void main(String[] args)
 	{
 		System.out.println("Load Start!!");
-		new RTreeLoad(args);
+		System.out.println("请依次输入 input_file tree_file capacity query_type [intersection | 10NN]:");
+		Scanner in = new Scanner(System.in);
+		String input = in.nextLine();
+		String [] inputList = input.split(" ");
+		new RTreeLoad(inputList);
 	}
 	
-	RTreeLoad(String[] args)
+	RTreeLoad(String[] inputList)
 	{
 		try
 		{
-			if (args.length != 4)
+			if (inputList.length != 4)
 			{
 				System.err.println("Usage: RTreeLoad input_file tree_file capacity query_type [intersection | 10NN].");
 				System.exit(-1);
@@ -40,11 +45,11 @@ public class RTreeLoad
 
 			try
 			{
-				lr = new LineNumberReader(new FileReader(args[0]));
+				lr = new LineNumberReader(new FileReader(inputList[0]));
 			}
 			catch (FileNotFoundException e)
 			{
-				System.err.println("Cannot open data file " + args[0] + ".");
+				System.err.println("Cannot open data file " + inputList[0] + ".");
 				System.exit(-1);
 			}
 
@@ -55,7 +60,7 @@ public class RTreeLoad
 			ps.setProperty("Overwrite", b);
 				//overwrite the file if it exists.
 
-			ps.setProperty("FileName", args[1]);
+			ps.setProperty("FileName", inputList[1]);
 				// .idx and .dat extensions will be added.
 
 			Integer i = new Integer(4096);
@@ -77,7 +82,7 @@ public class RTreeLoad
 			Double f = new Double(0.7);
 			ps2.setProperty("FillFactor", f);
 
-			i = new Integer(args[2]);
+			i = new Integer(inputList[2]);
 			ps2.setProperty("IndexCapacity", i);
 			ps2.setProperty("LeafCapacity", i);
 				// Index capacity and leaf capacity may be different.
@@ -149,6 +154,7 @@ public class RTreeLoad
 
 					//tree.insertData(data.getBytes(), r, id);
 
+					//将数据存在数据库或者外存，内存中存为null
 					tree.insertData(null, r, id);
 						// example of passing a null pointer as the associated data.
 				}
@@ -161,13 +167,13 @@ public class RTreeLoad
 
 					MyVisitor vis = new MyVisitor();
 
-					if (args[3].equals("intersection"))
+					if (inputList[3].equals("intersection"))
 					{
 						Region r = new Region(f1, f2);
 						tree.intersectionQuery(r, vis);
 							// this will find all data that intersect with the query range.
 					}
-					else if (args[3].equals("10NN"))
+					else if (inputList[3].equals("10NN"))
 					{
 						Point p = new Point(f1);
 						tree.nearestNeighborQuery(10, p, vis);

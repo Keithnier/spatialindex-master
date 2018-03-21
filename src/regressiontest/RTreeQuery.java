@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import spatialindex.rtree.RTree;
@@ -26,7 +27,11 @@ public class RTreeQuery
 {
 	public static void main(String[] args)
 	{
-		new RTreeQuery(args);
+		System.out.println("请依次输入 query_file tree_file query_type [intersection | 10NN]:");
+		Scanner in = new Scanner(System.in);
+		String input = in.nextLine();
+		String [] inputList = input.split(" ");
+		new RTreeQuery(inputList);
 	}
 	
 	RTreeQuery(String[] args)

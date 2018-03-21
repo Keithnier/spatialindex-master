@@ -14,6 +14,9 @@ class NNEntry
 }
 
 /**
+ * 该类实现对data数据的读取（读入内存），包括data和query，并实现
+ * 1、判断query和data是否相交，若相交则输出
+ * 2、计算query和data的10NN个对象并输出（结果存在并列情况，可能不止10个）
  * data格式：op(0为删除1为插入2为查询) id x1 y1 x2 y2
  */
 public class Exhaustive
