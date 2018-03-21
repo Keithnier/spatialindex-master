@@ -121,6 +121,7 @@ public class Exhaustive
 						Map.Entry e = (Map.Entry) it.next();
 						MyRegion r = (MyRegion) e.getValue();
 						Integer i = (Integer) e.getKey();
+						System.out.println(r.getMinDist(query));
 						queue[cIndex++] = new NNEntry(i.intValue(), r.getMinDist(query));
 					}
 
