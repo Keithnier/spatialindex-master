@@ -28,16 +28,16 @@ import neustore.base.ByteArray;
  * <li> The user can call {@link #getIOs} to get statistics, or call {@link #clearIOs}
  * to initialize the counters.
  * </ul>
- * 
+ *
  * @see DBIndex
  * @see DBPage
  * @author Tian Xia &lt;tianxia@ccs.neu.edu&gt;<br>Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */
 public abstract class DBBuffer {
-	
+
 	/**
 	 * Opens an existing Database file.
-	 *  
+	 *
 	 * @param bufferSize	total number of buffer pages
 	 * @param pageSize		page size
 	 */
@@ -52,10 +52,11 @@ public abstract class DBBuffer {
 	 * <i>disk-read</i>, <i>disk-write</i>, <i>buffer-read</i> and
 	 * <i>buffer-write</i>. They are stored in the integer array in
 	 * the above order.
-	 * 
+	 *
 	 * @return  the four I/Os
 	 */
 	public int[] getIOs() {
+		// 以整型数组的形式，存储IO的状态，统计并报告I/O次数，可能用于性能分析
 		int[] io = new int[4];
 		io[0] += diskReadIO;
 		io[1] += diskWriteIO;
@@ -67,7 +68,7 @@ public abstract class DBBuffer {
 	/**
 	 * Loads a page (the byte array) from disk.
 	 * Increases <code>diskReadIO</code> by one.
-	 * 
+	 *
 	 * @param file	the file
 	 * @param page    the byte array of length pageSize
 	 * @param pageID  the page ID
@@ -82,11 +83,11 @@ public abstract class DBBuffer {
 		}
 		diskReadIO++;
 	}
-	
+
 	/**
 	 * Saves a page (the byte array) to the disk.
 	 * Increases <code>diskWriteIO</code> by one.
-	 * 
+	 *
 	 * @param page   the byte array of length pageSize
 	 * @param pageID the page ID
 	 * @throws IOException
@@ -100,29 +101,31 @@ public abstract class DBBuffer {
 		file.seek(pageSize*pageID);
 		file.write(page);
 	}
-		
+
 	/**
 	 * Resets the four counters <code>bufferReadIO</code>, etc.
 	 */
 	public void clearIOs(){
+		// 清除I/O操作次数统计
 		bufferReadIO = 0;
 		bufferWriteIO = 0;
 		diskReadIO = 0;
 		diskWriteIO = 0;
 	}
-	
+
 	/**
 	 * Returns a buffered page. If it is in buffer, returns it. Otherwise,
 	 * loads it from disk and then returns it. Increases <code>bufferReadIO</code>.
-	 * 
+	 *
 	 * @param file		which file
 	 * @param pageID   page ID
-	 * @return the buffered page 
+	 * @return the buffered page
 	 * @throws IOException
 	 */
 	public DBBufferReturnElement readPage(RandomAccessFile file, long pageID) throws IOException {
+		// 返回一个缓冲页，如果在缓冲中，直接返回，否则就从硬盘上返回
 		bufferReadIO ++;
-		
+
 		DBBufferStoredElement stored = find(file, pageID);
 		if ( stored == null ) {
 			byte[] page = new byte[pageSize];
@@ -135,15 +138,15 @@ public abstract class DBBuffer {
 			stored.pageID = pageID;
 			stored.file = file;
 			add( stored );
-		}	
+		}
 		DBBufferReturnElement ret = new DBBufferReturnElement(
 				stored.nodeType, stored.object, stored.parsed);
 		return ret;
 	}
-	
+
 	/**
 	 * Writes a DBPage to buffer.
-	 * 
+	 *
 	 * @param file		the file
 	 * @param pageID  the page ID
 	 * @param dbpage  the DBPage object
@@ -151,7 +154,7 @@ public abstract class DBBuffer {
 	 */
 	public void writePage( RandomAccessFile file, long pageID, DBPage dbpage ) throws IOException {
 		bufferWriteIO ++;
-		
+
 		DBBufferStoredElement stored = find( file, pageID );
 		if ( stored == null ) {
 			stored = new DBBufferStoredElement();
@@ -170,12 +173,12 @@ public abstract class DBBuffer {
 			stored.nodeType = dbpage.nodeType;
 		}
 	}
-	
+
 	/**
 	 * Pins a page. 
 	 * Such pages can not be swapped out of the buffer. The pinCount 
 	 * in DBBufferStoredElement is increased by 1.
-	 * 
+	 *
 	 * @param file		the file
 	 * @param pageID   the page ID of the page to be pinned
 	 */
@@ -189,7 +192,7 @@ public abstract class DBBuffer {
 	/**
 	 * Unpins a page. 
 	 * The pinCount in DBBufferStoredElement is decreased by 1.
-	 * 
+	 *
 	 * @param file		the file
 	 * @param pageID   the page ID of the page to be unpinned
 	 */
@@ -199,7 +202,7 @@ public abstract class DBBuffer {
 			stored.pinCount --;
 		}
 	}
-	
+
 	/**
 	 * number of read IOs on the buffer
 	 */
@@ -215,7 +218,7 @@ public abstract class DBBuffer {
 	/**
 	 * number of write IOs on the disk
 	 */
-	protected int diskWriteIO;	
+	protected int diskWriteIO;
 	/**
 	 * how many pages the buffer has
 	 */
@@ -232,36 +235,36 @@ public abstract class DBBuffer {
 	/**
 	 * Finds a page in buffer.
 	 * Note: do not increase bufferReadIO.
-	 * 
+	 *
 	 * @param file		the file
 	 * @param pageID    the page ID
 	 * @return an instance of DBBufferStoredElement if found; <i>null</i>otherwise.
 	 */
 	protected abstract DBBufferStoredElement find(RandomAccessFile file, long pageID);
-	
+
 	/**
 	 * Adds a page to the buffer.
 	 * Note: do not increase bufferReadIO.
-	 * 
+	 *
 	 * @param stored   the stored element
 	 * @throws IOException
 	 */
 	protected abstract void add( DBBufferStoredElement stored ) throws IOException;
-	
+
 	/**
 	 * Flushes the buffer pages corresponding to a give file. 
 	 * Makes the buffer empty, while saving modified pages to disk.
-	 * 
+	 *
 	 * @param file	the file
 	 * @throws IOException
 	 */
-	protected abstract void flush (RandomAccessFile file) throws IOException;	
-	
+	protected abstract void flush (RandomAccessFile file) throws IOException;
+
 	/**
 	 * An element stored in {@link DBBuffer}.
 	 * The users do not need to know this class, unless they want to design a
 	 * new buffer management class.
-	 *  
+	 *
 	 * @see DBBuffer
 	 * @author Tian Xia &lt;tianxia@ccs.neu.edu&gt;<br>Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
 	 */
@@ -297,7 +300,7 @@ public abstract class DBBuffer {
 		 * Other values should be explained by the application.
 		 */
 		protected int nodeType;
-		
+
 		public DBBufferStoredElement() {
 			pinCount = 0;
 			dirty = false;
@@ -308,11 +311,11 @@ public abstract class DBBuffer {
 			nodeType = 0;
 		}
 	}
-	
+
 	/**
 	 * A class that represents on entry in the buffer.
 	 * It is composed of a file and a pageID.
-	 *  
+	 *
 	 * @see DBBuffer
 	 * @see LRUBuffer
 	 * @author Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
@@ -320,16 +323,16 @@ public abstract class DBBuffer {
 	class DBBufferHashKey {
 		protected RandomAccessFile file;
 		protected long pageID;
-		
+
 		public DBBufferHashKey( RandomAccessFile file, long pageID ) {
 			this.file = file;
 			this.pageID = pageID;
 		}
-		
+
 		public int hashCode() {
 			return file.hashCode()+(new Long(pageID)).hashCode();
 		}
-		
+
 		public boolean equals(Object obj) {
 			DBBufferHashKey o = (DBBufferHashKey)obj;
 			return file==o.file && pageID==o.pageID;

@@ -8,25 +8,26 @@ import java.io.IOException;
 
 /**
  * A class that provides basic read/write operators on a byte array.
- * 
+ *
  * @author Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */
 public class ByteArray {
 
 	public static final boolean READ = true;
 	public static final boolean WRITE = false;
-	
+
 	private ByteArrayInputStream byte_in = null;
 	private DataInputStream in = null;
-	private byte[] buf = null;
-	private int offset = 0;
-	
+	private byte[] buf = null; //一块内存，即一块存储空间
+	private int offset = 0; // 内存空间中的字节偏移量
+
 	/**
 	 * Constructor.
 	 * @param _buf     the associated byte array
 	 * @param isRead   whether to read or write
 	 */
 	public ByteArray( byte[] _buf, boolean isRead ) {
+		//如果可读，那么就产生一个输入流
 		if ( isRead ) {
 			byte_in = new ByteArrayInputStream(_buf);
 			in = new DataInputStream(byte_in);
@@ -35,7 +36,7 @@ public class ByteArray {
 			buf = _buf;
 		}
 	}
-	
+
 	/**
 	 * Reads an integer.
 	 * @return the integer
@@ -44,7 +45,7 @@ public class ByteArray {
 	public int readInt() throws IOException {
 		return in.readInt();
 	}
-	
+
 	/**
 	 * Reads from the byte array to fill a passed buffer.
 	 * Note: the number of bytes read is typically equal to <code>b.length</code>.
@@ -54,7 +55,7 @@ public class ByteArray {
 	public void read( byte[] b ) throws IOException {
 		in.read(b);
 	}
-	
+
 	/**
 	 * Writes an integer.
 	 * @param value   the integer to write
@@ -69,7 +70,7 @@ public class ByteArray {
 		out.close();
 		byte_out.close();
 	}
-	
+
 	public void writeLong( long value ) throws IOException {
 		ByteArrayOutputStream byte_out = new ByteArrayOutputStream(8);
 		DataOutputStream out = new DataOutputStream(byte_out);
