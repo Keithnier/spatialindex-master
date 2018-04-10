@@ -38,6 +38,7 @@ abstract class Node implements INode
 {
 	protected RTree m_pTree = null;
 		// Parent of all nodes.
+	//这个节点有什么用？
 
 	protected int m_level = -1;
 		// The level of the node in the tree.
@@ -50,6 +51,7 @@ abstract class Node implements INode
 
 	protected int m_children = 0;
 		// The number of children pointed by this node.
+		// 同时该数值也是新插入数据的索引值
 
 	protected int m_capacity = -1;
 		// Specifies the node capacity.
@@ -59,16 +61,22 @@ abstract class Node implements INode
 
 	protected byte[][] m_pData = null;
 		// The data stored in the node.
+		// 二维byte数组存储数据，数据形式是什么？
 
 	protected Region[] m_pMBR = null;
 		// The corresponding data MBRs.
+		// 为什么有两个MBR?
+		// 数组形式表示其子结点的信息
 
 	protected int[] m_pIdentifier = null;
 		// The corresponding data identifiers.
+		// 两个identifiers?
+		// 用数据存储器子结点的信息
 
 	protected int[] m_pDataLength = null;
 
 	int m_totalDataLength = 0;
+	// 所有数据的总长度
 
 	//
 	// Abstract methods
@@ -105,7 +113,7 @@ abstract class Node implements INode
 	{
 		if (index < 0 || index >= m_children) throw new IndexOutOfBoundsException("" + index);
 
-		return m_pIdentifier[index];
+		return m_pIdentifier[index];// 是否有本身结点标识符呢?
 	}
 
 	public IShape getChildShape(int index) throws IndexOutOfBoundsException
@@ -119,7 +127,7 @@ abstract class Node implements INode
 	{
 		return m_level;
 	}
-
+	// 树中分为两类结点，一个是叶子节点，二是索引节点
 	public boolean isLeaf()
 	{
 		return (m_level == 0);
@@ -142,7 +150,7 @@ abstract class Node implements INode
 		m_capacity = capacity;
 		m_nodeMBR = (Region) pTree.m_infiniteRegion.clone();
 
-		m_pDataLength = new int[m_capacity + 1];
+		m_pDataLength = new int[m_capacity + 1]; // 容量代表后代数目，+1表示自身信息有存储吗？
 		m_pData = new byte[m_capacity + 1][];
 		m_pMBR = new Region[m_capacity + 1];
 		m_pIdentifier = new int[m_capacity + 1];
@@ -161,6 +169,7 @@ abstract class Node implements INode
 		m_children++;
 
 		Region.combinedRegion(m_nodeMBR, mbr);
+		// 插入结点后，扩大最小限定箱的范围。使得本结点的MBR包含子结点的MBR
 	}
 
 	protected void deleteEntry(int index) throws IndexOutOfBoundsException
@@ -171,7 +180,7 @@ abstract class Node implements INode
 
 		m_totalDataLength -= m_pDataLength[index];
 		m_pData[index] = null;
-
+		// 删除操作，把最后一个结点的信息移动到删除的索引的位置。
 		if (m_children > 1 && index != m_children - 1)
 		{
 			m_pDataLength[index] = m_pDataLength[m_children - 1];
@@ -213,7 +222,7 @@ abstract class Node implements INode
 
 			insertEntry(pData, mbr, id);
 			m_pTree.writeNode(this);
-
+			// 调整树结构
 			if (! b && ! pathBuffer.empty())
 			{
 				int cParent = ((Integer) pathBuffer.pop()).intValue();
@@ -386,7 +395,7 @@ abstract class Node implements INode
 			keep.add(new Integer(v[cCount].m_id));
 		}
 	}
-
+	// 分离树
 	protected void rtreeSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2)
 	{
 		int cChild;

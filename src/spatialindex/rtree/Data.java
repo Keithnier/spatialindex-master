@@ -19,6 +19,7 @@ public class Data implements IData, Serializable
 		public IShape getShape() { return m_shape; }
 		public byte[] getData()
 		{
+			// 本项目主旨在查询，即数据不可改动，这里返回数据的副本，而不能暴露其引用
 			byte[] data = new byte[m_pData.length];
 			System.arraycopy(m_pData, 0, data, 0, m_pData.length);
 			return data;

@@ -14,7 +14,6 @@ public class CandidatepointComparator implements Comparator {
 		if (p1.location_xcoordinate > p2.location_xcoordinate) return 1;
 		return 0;
 
-
 		
 	}
 

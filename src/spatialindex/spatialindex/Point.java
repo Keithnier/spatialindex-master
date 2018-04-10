@@ -55,6 +55,7 @@ public class Point implements IShape, Cloneable
 
 			for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++)
 			{
+				// double数值之间无法直接比较，这里采用偏移值的方法。如果左右差距大于一个EPSILON，则认为结点不相等
 				if (m_pCoords[cIndex] < pt.m_pCoords[cIndex] - SpatialIndex.EPSILON ||
 						m_pCoords[cIndex] > pt.m_pCoords[cIndex] + SpatialIndex.EPSILON) return false;
 			}
