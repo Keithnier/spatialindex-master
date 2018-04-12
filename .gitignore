@@ -52,3 +52,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 /.idea/
+
+# 取消不必要文件的提交
+bin
+*.db*
+*.id*
