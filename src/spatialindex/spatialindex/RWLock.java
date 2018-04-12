@@ -33,6 +33,9 @@ package spatialindex.spatialindex;
 
 import java.util.*;
 
+/**
+ * ¶ÁĞ´Ëø
+ */
 public class RWLock
 {
 	private int active_readers;

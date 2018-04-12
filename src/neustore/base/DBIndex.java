@@ -170,7 +170,7 @@ public abstract class DBIndex {
 		}
 		try {
 			ByteArray ba = new ByteArray( theEmptyPage, true );
-			ba.readInt();
+			ba.readInt(); // Ìø¹ýpageType
 			firstEmpty = ba.readInt();
 		} catch (IOException e) {}
 

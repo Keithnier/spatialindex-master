@@ -10,7 +10,10 @@ import neustore.base.ByteArray;
  * A derived class should implement the functions to <code>read</code> from
  * a byte array, and to <code>write</code> to a byte array. 
  * A convention is that in the byte array, the first integer should be nodeType.
- * 
+ *
+ * 该字节数组中第一个整型数应当是结点类型， 0表示空白页，-1表示内存页，其他为用户自定义
+ * 空白页中第一个整型为0，之后为下一个空白页的号，最后一个空白页该pointer为-1
+ *
  * @author Tian Xia &lt;tianxia@ccs.neu.edu&gt;<br>Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */
 public abstract class DBPage {

@@ -67,6 +67,7 @@ public class Region implements IShape
 		System.arraycopy(r.m_pHigh, 0, m_pHigh, 0, r.m_pHigh.length);
 	}
 
+	// 同一维度下的坐标相等，这认为是相等的
 	public boolean equals(Object o)
 	{
 		if (o instanceof Region)
@@ -126,6 +127,7 @@ public class Region implements IShape
 		throw new IllegalStateException("touches: Not implemented yet!");
 	}
 
+	// 各个维度坐标去中值
 	public double[] getCenter()
 	{
 		double[] pCoords = new double[m_pLow.length];
@@ -148,6 +150,7 @@ public class Region implements IShape
 		return new Region(m_pLow, m_pHigh);
 	}
 
+	// 各个维度上长度的乘积
 	public double getArea()
 	{
 		double area = 1.0;
@@ -204,6 +207,7 @@ public class Region implements IShape
 		return false;
 	}
 
+	// 勾股定理，还有什么好说的呢！
 	public double getMinimumDistance(final Region r)
 	{
 		if (m_pLow.length != r.m_pLow.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -229,6 +233,7 @@ public class Region implements IShape
 		return Math.sqrt(ret);
 	}
 
+	// 点的每一个维度的坐标都在Region范围内，则认为是包含
 	public boolean contains(final Point p)
 	{
 		if (m_pLow.length != p.m_pCoords.length) throw new IllegalArgumentException("contains: Shape has the wrong number of dimensions.");
@@ -253,6 +258,7 @@ public class Region implements IShape
 		return false;
 	}
 
+	// 勾股定理
 	public double getMinimumDistance(final Point p)
 	{
 		if (m_pLow.length != p.m_pCoords.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -316,6 +322,7 @@ public class Region implements IShape
 		return new Region(mn, mx);
 	}
 
+	// 范围合并
 	public static Region combinedRegion(Region[] pRegions)
 	{
 		double[] mn = new double[pRegions[0].m_pLow.length];
@@ -348,6 +355,7 @@ public class Region implements IShape
 		}
 	}
 
+	//返回边界
 	// Returns the margin of a region. It is calcuated as the sum of  2^(d-1) * width in each dimension.
 	public double getMargin()
 	{
@@ -377,7 +385,7 @@ public class Region implements IShape
 	public String toString()
 	{
 		String s = "";
-
+		//使用StingBuilder好一点
 		for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) s += m_pLow[cIndex] + " ";
 
 		s += ": ";

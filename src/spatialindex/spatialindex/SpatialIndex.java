@@ -37,6 +37,9 @@ import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.MemoryStorageManager;
 import spatialindex.storagemanager.PropertySet;
 
+/**
+ * æ≤Ã¨π§æﬂ¿‡
+ */
 public class SpatialIndex
 {
 	public static final String EMAIL = "marioh@cs.ucr.edu";

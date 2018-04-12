@@ -81,11 +81,13 @@ public class Point implements IShape, Cloneable
 
 	public boolean intersects(final IShape s)
 	{
+		// 结点的相交判断，通过其中一个区域是否包含其坐标来判断
 		if (s instanceof Region) return ((Region) s).contains(this);
 
 		return false;
 	}
 
+	// Point映射为坐标点，或者查询点，点与点之间不存在包含关系
 	public boolean contains(final IShape s)
 	{
 		return false;
@@ -100,6 +102,7 @@ public class Point implements IShape, Cloneable
 		return false;
 	}
 
+	// 点的中心就是其坐标点。
 	public double[] getCenter()
 	{
 		double[] pCoords = new double[m_pCoords.length];
@@ -117,11 +120,13 @@ public class Point implements IShape, Cloneable
 		return new Region(m_pCoords, m_pCoords);
 	}
 
+	// 点没有面积
 	public double getArea()
 	{
 		return 0.0f;
 	}
 
+	// 查询操作中，返回距离
 	public double getMinimumDistance(final IShape s)
 	{
 		if (s instanceof Region) return ((Region) s).getMinimumDistance(this);
@@ -131,6 +136,7 @@ public class Point implements IShape, Cloneable
 		throw new IllegalStateException("getMinimumDistance: Not implemented yet!");
 	}
 
+	// 各个维度上点到点之间的距离，勾股定理及其拓展
 	double getMinimumDistance(final Point p)
 	{
 		if (m_pCoords.length != p.m_pCoords.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -145,6 +151,7 @@ public class Point implements IShape, Cloneable
 		return Math.sqrt(ret);
 	}
 
+	// 获得点在指定维度上的坐标
 	public double getCoord(int index) throws IndexOutOfBoundsException
 	{
 		if (index >= m_pCoords.length) throw new IndexOutOfBoundsException("" + index);

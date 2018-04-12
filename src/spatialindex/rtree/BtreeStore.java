@@ -18,6 +18,9 @@ import neustore.base.IntKey;
 import neustore.base.KeyData;
 import spatialindex.spatialindex.Point;
 
+/**
+ * BTreeStore用来管理关键字在文档中的权重
+ */
 public class BtreeStore {
 
 	CacheRecordManager cacheRecordManager;
@@ -58,7 +61,13 @@ public class BtreeStore {
 		double[] f = new double[2];
 		
 		int count = 0;
-		
+
+		/**
+		 *  B树data文件格式
+		 *  id,?,?,wordID weight,wordID weight,...\n
+		 *  id,?,?,wordID weight,wordID weight,...\n
+		 *  ...
+		 */
 		while ( (line=is.readLine()) != null){
 			temp = line.split(",");
 			int id = Integer.parseInt(temp[0]);

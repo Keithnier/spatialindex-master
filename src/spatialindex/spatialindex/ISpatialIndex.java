@@ -37,7 +37,7 @@ import spatialindex.storagemanager.PropertySet;
  * 应为所有类型的条目提供适当的访问器方法接口。
  *
  * 当创建新的索引时，应该为其分配一个唯一的索引ID，这将在从持久存储重新加载索引时使用。
- * 此索引ID应作为用于构建索引实例的PropsertySet实例中的IndexIdentifier属性返回。
+ * 此索引ID应作为用于构建索引实例的PropertySet实例中的IndexIdentifier属性返回。
  * 使用索引ID，多个索引可以存储在同一个存储管理器中。 管理索引ID是用户的责任。
  * 将错误的索引ID与错误的存储管理器或索引类型关联会导致未定义的结果。
  */

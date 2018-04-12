@@ -49,6 +49,14 @@ import java.util.TreeSet;
  * 如果发生意外故障，存储管理器的更改将由于.idx文件过时而丢失。避免这种灾难是未来的工作。
  * 重要提示：请记住在处理索引之前调用ISpatialIndex.flush（），因为在JVM退出时不会发生一些终止事件。
  */
+
+/**
+ * 这里给出.idx文件的结构
+ * +-----------+----------+------------+-------------+-----------+--------+-------------+-----------------+--------+
+ * | pageSize | nextPage | emptyCount | emptyNum... | entryCount| entryID| entryLength | pageCountOfEntry| pageID |
+ * +---------+----------+------------+-------------+-----------+--------+-------------+------------------+-------+
+ * 页面大小，下一页id，空页数目，空页id...，实体数目，实体id，实体长度，实体中页面数目，实体中页面id....
+ */
 public class DiskStorageManager implements IStorageManager
 {
 	private RandomAccessFile m_dataFile = null;
@@ -94,6 +102,7 @@ public class DiskStorageManager implements IStorageManager
 			File dataFile = new File((String) var + ".dat");
 
 			// check if files exist.
+			// 如果文件不存在，将创建文件。
 			if (bOverwrite == false && (! indexFile.exists() || ! dataFile.exists())) bOverwrite = true;
 
 			if (bOverwrite)
@@ -117,8 +126,10 @@ public class DiskStorageManager implements IStorageManager
 		}
 
 		// find page size.
+		// 配置页面大小，以及下一页的序号。
 		if (bOverwrite == true)
 		{
+			// Overwrite == true 意味着.idx文件是新文件，必须在配置中声明页面大小，且初始化页号一定为0
 			var = ps.getProperty("PageSize");
 
 			if (var != null)
@@ -154,6 +165,7 @@ public class DiskStorageManager implements IStorageManager
 		}
 
 		// create buffer.
+		// 从磁盘文件读入数据到内存
 		m_buffer = new byte[m_pageSize];
 
 		if (bOverwrite == false)
@@ -202,6 +214,7 @@ public class DiskStorageManager implements IStorageManager
 	{
 		try
 		{
+			// 这个字节是-1吗？
 			m_indexFile.seek(0l);
 
 			m_indexFile.writeInt(m_pageSize);

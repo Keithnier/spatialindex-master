@@ -33,6 +33,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * 缓存的抽象层次。
+ * 使用HashMap进行矢量控制，将实体和唯一ID相互关联。并提供了存储管理器
+ * ，命中统计，默认的容量是10
+ * 数据来源于两方面，首先查找缓存，否则查找存储管理器中的数据
+ * 提供的功能：
+ * 1. 载入字节数组(loadByteArray)
+ * 2. 存储字节数组(storeByteArray)
+ * 3. 删除字节数组(deleteByteArray)
+ * ...
+ * 子类必须自己决定对实体的操作:
+ * 1. 加入一个实体(addEntry)
+ * 2. 移除一个实体(removeEntry)
+ *
+ * 脏数据问题，如果数据被写入到缓存中，那么缓存数据就是脏的，必须在某一时刻写回存储
+ * 基于不同的换页策略，目前有两种直接子类
+ * RandomEvictionBuffer和TreeLRUBuffer
+ */
 public abstract class Buffer implements IBuffer
 {
 	int m_capacity = 10;
@@ -72,6 +90,7 @@ public abstract class Buffer implements IBuffer
 
 		return ret;
 	}
+
 	public int storeByteArray(final int id, final byte[] data)
 	{
 		int ret = id;
@@ -115,6 +134,7 @@ public abstract class Buffer implements IBuffer
 
 		return ret;
 	}
+
 	public void deleteByteArray(final int id)
 	{
 		Integer ID = new Integer(id);
@@ -141,6 +161,7 @@ public abstract class Buffer implements IBuffer
 
 		m_storageManager.flush();
 	}
+
 	public void clear()
 	{
 		Iterator it = m_buffer.entrySet().iterator();

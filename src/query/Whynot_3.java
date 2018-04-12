@@ -99,14 +99,14 @@ public class Whynot_3 {
 			System.out.println("Algorithm I : ");
 			a_start = System.currentTimeMillis(); 
 			l = irtree.determine_rank(qwords, qpoint, topk, expected_ob, alpha, 0);
-			irtree.answeringWhyNot_1(qwords, qpoint, l, 0.5, 1);
+//			irtree.answeringWhyNot_1(qwords, qpoint, l, 0.5, 1);
 			a_end = System.currentTimeMillis();
 		    System.out.println("Millisecond time cost by Algorithm I : " + (a_end - a_start));			
 		    
 			//Algorithm II:
 			System.out.println("\nAlgorithm II : ");
 			a_start = System.currentTimeMillis(); 
-			irtree.answeringWhyNot_2(qwords, qpoint, topk, expected_ob, alpha, 0.5, 1);
+//			irtree.answeringWhyNot_2(qwords, qpoint, topk, expected_ob, alpha, 0.5, 1);
 			a_end = System.currentTimeMillis();
 			System.out.println("Millisecond time cost by Algorithm II : " + (a_end - a_start));
 			

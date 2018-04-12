@@ -8,7 +8,9 @@ import java.io.IOException;
  * A class that stores a variable-length String.
  * Note that to write a StringData to disk, the occupied size is four bytes
  * larger than the String size, for we also store the size of the String. 
- * 
+ *
+ * 字符串类型的数据存储，比字符串大小大四个字节，因为将字符串的长度也存储了。
+ *
  * @author Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */
 public class StringData implements Data {

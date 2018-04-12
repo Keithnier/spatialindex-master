@@ -58,16 +58,24 @@ public class InvertedIndex extends DBIndex {
 		sampleData = _sampleData;
 
 		int cachesize = buffersize;
+		// RecordManagerFactory.createRecordManager()接受一个String作为参数，该参数作为它创建的两个数据库文件名字的前缀。
 		cacheRecordManager = new CacheRecordManager(RecordManagerFactory.createRecordManager(filename), cachesize, true);
 		pageSize = pagesize;
-
+		/**
+		 * 如果是用RecordManager.insert()插入数据，数据存储形式为id+序列化的对象
+		 * 如果是BTree或HTree.insert()插入数据，数据保存形式为key+value，类似HashTable;
+		 */
 		if ( !isCreate ) {
+			// 这里是通过别名来取出数据的id，如果是有记录的id，那么就用fetch(id)的方法
+			// BTree.load()方法也可以获得一个BTree的对象，该方法需要两个参数，一个是RecordManager，另一个是BTree的id值。
+			// 而创建一个BTree对象使用的是静态的BTree.createInstance()，该方法接受两个参数，一个是Recordmanager，另一个是Comparator(让其能够对键值进行比较)
 			recid = cacheRecordManager.getNamedObject( "0" );
 			btree = BTree.load( cacheRecordManager, recid );
 			//System.out.println("loading btree: " + btree.size());
 		} 
 		else {
 			btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 1000 );
+			// jdbm中setNameObject()方法都是给对象起别名。同样getNameObject(别名)获得的都是该对象在jdbm中的id值。
 			cacheRecordManager.setNamedObject( "0", btree.getRecid() );	          
 		}
 
@@ -84,7 +92,7 @@ public class InvertedIndex extends DBIndex {
 		cacheRecordManager = new CacheRecordManager(RecordManagerFactory.createRecordManager(filename), cachesize, true);
 		pageSize = pagesize;
 
-
+		//？？这里是不是缺少代码？BTree的处理呢？
 	}
 
 	protected void readIndexHead (byte[] indexHead) {
