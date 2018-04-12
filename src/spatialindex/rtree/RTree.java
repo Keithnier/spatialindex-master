@@ -507,7 +507,7 @@ public class RTree implements ISpatialIndex
 	{
 		Object var;
 
-		// tree variant.
+		// tree variant. 树的种类
 		var = ps.getProperty("TreeVariant");
 		if (var != null)
 		{

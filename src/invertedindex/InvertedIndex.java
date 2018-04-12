@@ -130,6 +130,15 @@ public class InvertedIndex extends DBIndex {
 		return thePage;
 	}
 
+	/**
+	 * µ¹ÅÅË÷Òý½á¹¹£º
+	 * wordID | (ArrayList<KeyData<docID,weight>>) data |....
+	 * wordID | (ArrayList<KeyData<docID,weight>>) data |....
+	 * @param docID
+	 * @param document
+	 * @param invertedindex
+	 * @throws IOException
+	 */
 
 	public void insertDocument(int docID, Vector document, Hashtable invertedindex) throws IOException{
 		IntKey key = new IntKey(docID);
