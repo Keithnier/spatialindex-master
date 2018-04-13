@@ -1,28 +1,28 @@
-##´úÂëÔÄ¶Á¼ÇÂ¼
+##ä»£ç é˜…è¯»è®°å½•
 <ol>
-<li>ÎÄµµ¹Ø¼ü×ÖµÄ¹ØÁª:´úÂëÊ¹ÓÃjdbm¼ÇÂ¼ÁËÎÄµµidÒÔ¼°¸÷¸ö¹Ø¼ü×ÖÔÚÎÄµµÖÐµÄÈ¨ÖØ£¬²¢Ê¹ÓÃBTree½øÐÐ¹ÜÀí¡£
-´Ó´úÂë<b>spatialindex/rtree/BtreeStore.java</b>ÖÐ¿ÉÒÔ×éÖ¯´¦Ïà¹Ø¼ÇÂ¼ÎÄ¼þµÄ¸ñÊ½:
+<li>æ–‡æ¡£å…³é”®å­—çš„å…³è”:ä»£ç ä½¿ç”¨jdbmè®°å½•äº†æ–‡æ¡£idä»¥åŠå„ä¸ªå…³é”®å­—åœ¨æ–‡æ¡£ä¸­çš„æƒé‡ï¼Œå¹¶ä½¿ç”¨BTreeè¿›è¡Œç®¡ç†ã€‚
+ä»Žä»£ç <b>spatialindex/rtree/BtreeStore.java</b>ä¸­å¯ä»¥ç»„ç»‡å¤„ç›¸å…³è®°å½•æ–‡ä»¶çš„æ ¼å¼:
 <pre>
                /**
-		 *  BÊ÷dataÎÄ¼þ¸ñÊ½
+		 *  Bæ ‘dataæ–‡ä»¶æ ¼å¼
 		 *  id,?,?,wordID weight,wordID weight,...\n
 		 *  id,?,?,wordID weight,wordID weight,...\n
 		 *  ...
 		 */
 </pre>
-ÆäÖÐ,?±íÊ¾Á½¸ödoubleÀàÐÍµÄ±äÁ¿£¬ÔÝÊ±²»ÖªµÀ¾ßÌå×÷ÓÃÊÇÊ²Ã´£¬ºóÃæ»á²¹³ä¡£
+å…¶ä¸­,?è¡¨ç¤ºä¸¤ä¸ªdoubleç±»åž‹çš„å˜é‡ï¼Œæš‚æ—¶ä¸çŸ¥é“å…·ä½“ä½œç”¨æ˜¯ä»€ä¹ˆï¼ŒåŽé¢ä¼šè¡¥å……ã€‚
 </li>
-<li><b>invertedindex/InvertedIndex.java</b>ÔÚ½¨Á¢µ¹ÅÅË÷ÒýµÄ¹ý³ÌÖÐ£¬»á¶ÁÈ¡1ÖÐµÄÎÄ¼þ¡£²¢ÀûÓÃ¸ÃÎÄ¼þ½¨Á¢µ¹ÅÅÁÐ±í¡£ÏÂÃæ¸ø³öµ¹ÅÅË÷Òý½á¹¹£º
-<pre>µ¹ÅÅË÷Òý½á¹¹£º
+<li><b>invertedindex/InvertedIndex.java</b>åœ¨å»ºç«‹å€’æŽ’ç´¢å¼•çš„è¿‡ç¨‹ä¸­ï¼Œä¼šè¯»å–1ä¸­çš„æ–‡ä»¶ã€‚å¹¶åˆ©ç”¨è¯¥æ–‡ä»¶å»ºç«‹å€’æŽ’åˆ—è¡¨ã€‚ä¸‹é¢ç»™å‡ºå€’æŽ’ç´¢å¼•ç»“æž„ï¼š
+<pre>å€’æŽ’ç´¢å¼•ç»“æž„ï¼š
     wordID | (ArrayList<KeyData<docID,weight>>) data |...
     wordID | (ArrayList<KeyData<docID,weight>>) data |...
     ...
 </pre>
- µ¹ÅÅË÷Òý±¾ÉíÊÇÒ»¸öHashtable£¬ÆäÖÐ¼üÎª¹Ø¼ü´ÊµÄid£¬ÖµÎªÒ»¸öArrayList£¬ÇÒ¸ÃÁ´±íÖÐÃ¿Ò»ÏîÊÇÒ»¸ö¶þÔª×é(ÎÄµµid£¬¹Ø¼ü´ÊÈ¨ÖØ)¡£
+ å€’æŽ’ç´¢å¼•æœ¬èº«æ˜¯ä¸€ä¸ªHashtableï¼Œå…¶ä¸­é”®ä¸ºå…³é”®è¯çš„idï¼Œå€¼ä¸ºä¸€ä¸ªArrayListï¼Œä¸”è¯¥é“¾è¡¨ä¸­æ¯ä¸€é¡¹æ˜¯ä¸€ä¸ªäºŒå…ƒç»„(æ–‡æ¡£idï¼Œå…³é”®è¯æƒé‡)ã€‚
 </li>
-<li>ÊäÈëÎÄµµ¸ñÊ½Îª1ÖÐµÄ¸ñÊ½£¬ÔÚBTreeStoreÖÐ»á½¨Á¢BTree¹ÜÀíÎÄµµ¼¯£¬Ö®ºóÔÙInvertedIndexÖÐ»á¶ÁÈ¡ÎÄµµ£¬½¨Á¢µ¹ÅÅË÷Òý¡£</li>
-<li>IRTreeµÄÅÅÐò¹æÔò£¬ÒÀ¾Ý·ÖÊýÖÆ¡£¾ßÌå´úÂëÈçÏÂ:
+<li>è¾“å…¥æ–‡æ¡£æ ¼å¼ä¸º1ä¸­çš„æ ¼å¼ï¼Œåœ¨BTreeStoreä¸­ä¼šå»ºç«‹BTreeç®¡ç†æ–‡æ¡£é›†ï¼Œä¹‹åŽå†InvertedIndexä¸­ä¼šè¯»å–æ–‡æ¡£ï¼Œå»ºç«‹å€’æŽ’ç´¢å¼•ã€‚</li>
+<li>IRTreeçš„æŽ’åºè§„åˆ™ï¼Œä¾æ®åˆ†æ•°åˆ¶ã€‚å…·ä½“ä»£ç å¦‚ä¸‹:
 <pre>score = (1-alpha)*(1-dist)+alpha*trs;</pre>
-ÆäÖÐalphaÊÇÈ¨ÖØµ÷½ÚÒòÊý£¬distÊÇ²éÑ¯µãºÍÊµ¼Ê½áµãµÄ¾àÀë£¬ÓÉgetMinimumDistance()·µ»Ø£¬trsÊÇTF(´ÊÆµ) / 5ËùµÃ¡£
+å…¶ä¸­alphaæ˜¯æƒé‡è°ƒèŠ‚å› æ•°ï¼Œdistæ˜¯æŸ¥è¯¢ç‚¹å’Œå®žé™…ç»“ç‚¹çš„è·ç¦»ï¼Œç”±getMinimumDistance()è¿”å›žï¼Œtrsæ˜¯TF(è¯é¢‘) / 5æ‰€å¾—ã€‚
 </li>
 </ol>
