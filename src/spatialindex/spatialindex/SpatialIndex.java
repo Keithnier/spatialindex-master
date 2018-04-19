@@ -38,7 +38,7 @@ import spatialindex.storagemanager.MemoryStorageManager;
 import spatialindex.storagemanager.PropertySet;
 
 /**
- * 静态工具类
+ * 闈欐�佸伐鍏风被
  */
 public class SpatialIndex
 {

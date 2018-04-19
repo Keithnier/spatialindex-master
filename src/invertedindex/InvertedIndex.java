@@ -58,24 +58,24 @@ public class InvertedIndex extends DBIndex {
 		sampleData = _sampleData;
 
 		int cachesize = buffersize;
-		// RecordManagerFactory.createRecordManager()½ÓÊÜÒ»¸öString×÷Îª²ÎÊı£¬¸Ã²ÎÊı×÷ÎªËü´´½¨µÄÁ½¸öÊı¾İ¿âÎÄ¼şÃû×ÖµÄÇ°×º¡£
+		// RecordManagerFactory.createRecordManager()æ¥å—ä¸€ä¸ªStringä½œä¸ºå‚æ•°ï¼Œè¯¥å‚æ•°ä½œä¸ºå®ƒåˆ›å»ºçš„ä¸¤ä¸ªæ•°æ®åº“æ–‡ä»¶åå­—çš„å‰ç¼€ã€‚
 		cacheRecordManager = new CacheRecordManager(RecordManagerFactory.createRecordManager(filename), cachesize, true);
 		pageSize = pagesize;
 		/**
-		 * Èç¹ûÊÇÓÃRecordManager.insert()²åÈëÊı¾İ£¬Êı¾İ´æ´¢ĞÎÊ½Îªid+ĞòÁĞ»¯µÄ¶ÔÏó
-		 * Èç¹ûÊÇBTree»òHTree.insert()²åÈëÊı¾İ£¬Êı¾İ±£´æĞÎÊ½Îªkey+value£¬ÀàËÆHashTable;
+		 * å¦‚æœæ˜¯ç”¨RecordManager.insert()æ’å…¥æ•°æ®ï¼Œæ•°æ®å­˜å‚¨å½¢å¼ä¸ºid+åºåˆ—åŒ–çš„å¯¹è±¡
+		 * å¦‚æœæ˜¯BTreeæˆ–HTree.insert()æ’å…¥æ•°æ®ï¼Œæ•°æ®ä¿å­˜å½¢å¼ä¸ºkey+valueï¼Œç±»ä¼¼HashTable;
 		 */
 		if ( !isCreate ) {
-			// ÕâÀïÊÇÍ¨¹ı±ğÃûÀ´È¡³öÊı¾İµÄid£¬Èç¹ûÊÇÓĞ¼ÇÂ¼µÄid£¬ÄÇÃ´¾ÍÓÃfetch(id)µÄ·½·¨
-			// BTree.load()·½·¨Ò²¿ÉÒÔ»ñµÃÒ»¸öBTreeµÄ¶ÔÏó£¬¸Ã·½·¨ĞèÒªÁ½¸ö²ÎÊı£¬Ò»¸öÊÇRecordManager£¬ÁíÒ»¸öÊÇBTreeµÄidÖµ¡£
-			// ¶ø´´½¨Ò»¸öBTree¶ÔÏóÊ¹ÓÃµÄÊÇ¾²Ì¬µÄBTree.createInstance()£¬¸Ã·½·¨½ÓÊÜÁ½¸ö²ÎÊı£¬Ò»¸öÊÇRecordmanager£¬ÁíÒ»¸öÊÇComparator(ÈÃÆäÄÜ¹»¶Ô¼üÖµ½øĞĞ±È½Ï)
+			// è¿™é‡Œæ˜¯é€šè¿‡åˆ«åæ¥å–å‡ºæ•°æ®çš„idï¼Œå¦‚æœæ˜¯æœ‰è®°å½•çš„idï¼Œé‚£ä¹ˆå°±ç”¨fetch(id)çš„æ–¹æ³•
+			// BTree.load()æ–¹æ³•ä¹Ÿå¯ä»¥è·å¾—ä¸€ä¸ªBTreeçš„å¯¹è±¡ï¼Œè¯¥æ–¹æ³•éœ€è¦ä¸¤ä¸ªå‚æ•°ï¼Œä¸€ä¸ªæ˜¯RecordManagerï¼Œå¦ä¸€ä¸ªæ˜¯BTreeçš„idå€¼ã€‚
+			// è€Œåˆ›å»ºä¸€ä¸ªBTreeå¯¹è±¡ä½¿ç”¨çš„æ˜¯é™æ€çš„BTree.createInstance()ï¼Œè¯¥æ–¹æ³•æ¥å—ä¸¤ä¸ªå‚æ•°ï¼Œä¸€ä¸ªæ˜¯Recordmanagerï¼Œå¦ä¸€ä¸ªæ˜¯Comparator(è®©å…¶èƒ½å¤Ÿå¯¹é”®å€¼è¿›è¡Œæ¯”è¾ƒ)
 			recid = cacheRecordManager.getNamedObject( "0" );
 			btree = BTree.load( cacheRecordManager, recid );
 			//System.out.println("loading btree: " + btree.size());
 		} 
 		else {
 			btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 1000 );
-			// jdbmÖĞsetNameObject()·½·¨¶¼ÊÇ¸ø¶ÔÏóÆğ±ğÃû¡£Í¬ÑùgetNameObject(±ğÃû)»ñµÃµÄ¶¼ÊÇ¸Ã¶ÔÏóÔÚjdbmÖĞµÄidÖµ¡£
+			// jdbmä¸­setNameObject()æ–¹æ³•éƒ½æ˜¯ç»™å¯¹è±¡èµ·åˆ«åã€‚åŒæ ·getNameObject(åˆ«å)è·å¾—çš„éƒ½æ˜¯è¯¥å¯¹è±¡åœ¨jdbmä¸­çš„idå€¼ã€‚
 			cacheRecordManager.setNamedObject( "0", btree.getRecid() );	          
 		}
 
@@ -92,7 +92,7 @@ public class InvertedIndex extends DBIndex {
 		cacheRecordManager = new CacheRecordManager(RecordManagerFactory.createRecordManager(filename), cachesize, true);
 		pageSize = pagesize;
 
-		//£¿£¿ÕâÀïÊÇ²»ÊÇÈ±ÉÙ´úÂë£¿BTreeµÄ´¦ÀíÄØ£¿
+		//ï¼Ÿï¼Ÿè¿™é‡Œæ˜¯ä¸æ˜¯ç¼ºå°‘ä»£ç ï¼ŸBTreeçš„å¤„ç†å‘¢ï¼Ÿ
 	}
 
 	protected void readIndexHead (byte[] indexHead) {
@@ -131,7 +131,7 @@ public class InvertedIndex extends DBIndex {
 	}
 
 	/**
-	 * µ¹ÅÅË÷Òı½á¹¹£º
+	 * å€’æ’ç´¢å¼•ç»“æ„ï¼š
 	 * wordID | (ArrayList<KeyData<docID,weight>>) data |....
 	 * wordID | (ArrayList<KeyData<docID,weight>>) data |....
 	 * @param docID
@@ -281,7 +281,10 @@ public class InvertedIndex extends DBIndex {
 	public void create(int treeid) throws IOException{
 
 		String BTREE_NAME = String.valueOf(treeid);
+//		System.out.println("BTREE_NAME " + BTREE_NAME);
 		recid = cacheRecordManager.getNamedObject( BTREE_NAME );
+//		System.out.println("true recid " + recid);
+//		System.out.println(recid);
 		if ( recid != 0 ) {
 			System.out.println("Creating an existing btree: " + treeid);
 			System.exit(-1);

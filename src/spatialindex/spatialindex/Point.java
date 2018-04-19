@@ -55,7 +55,7 @@ public class Point implements IShape, Cloneable
 
 			for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++)
 			{
-				// doubleÊýÖµÖ®¼äÎÞ·¨Ö±½Ó±È½Ï£¬ÕâÀï²ÉÓÃÆ«ÒÆÖµµÄ·½·¨¡£Èç¹û×óÓÒ²î¾à´óÓÚÒ»¸öEPSILON£¬ÔòÈÏÎª½áµã²»ÏàµÈ
+				// doubleæ•°å€¼ä¹‹é—´æ— æ³•ç›´æŽ¥æ¯”è¾ƒï¼Œè¿™é‡Œé‡‡ç”¨åç§»å€¼çš„æ–¹æ³•ã€‚å¦‚æžœå·¦å³å·®è·å¤§äºŽä¸€ä¸ªEPSILONï¼Œåˆ™è®¤ä¸ºç»“ç‚¹ä¸ç›¸ç­‰
 				if (m_pCoords[cIndex] < pt.m_pCoords[cIndex] - SpatialIndex.EPSILON ||
 						m_pCoords[cIndex] > pt.m_pCoords[cIndex] + SpatialIndex.EPSILON) return false;
 			}
@@ -81,13 +81,13 @@ public class Point implements IShape, Cloneable
 
 	public boolean intersects(final IShape s)
 	{
-		// ½áµãµÄÏà½»ÅÐ¶Ï£¬Í¨¹ýÆäÖÐÒ»¸öÇøÓòÊÇ·ñ°üº¬Æä×ø±êÀ´ÅÐ¶Ï
+		// ç»“ç‚¹çš„ç›¸äº¤åˆ¤æ–­ï¼Œé€šè¿‡å…¶ä¸­ä¸€ä¸ªåŒºåŸŸæ˜¯å¦åŒ…å«å…¶åæ ‡æ¥åˆ¤æ–­
 		if (s instanceof Region) return ((Region) s).contains(this);
 
 		return false;
 	}
 
-	// PointÓ³ÉäÎª×ø±êµã£¬»òÕß²éÑ¯µã£¬µãÓëµãÖ®¼ä²»´æÔÚ°üº¬¹ØÏµ
+	// Pointæ˜ å°„ä¸ºåæ ‡ç‚¹ï¼Œæˆ–è€…æŸ¥è¯¢ç‚¹ï¼Œç‚¹ä¸Žç‚¹ä¹‹é—´ä¸å­˜åœ¨åŒ…å«å…³ç³»
 	public boolean contains(final IShape s)
 	{
 		return false;
@@ -102,7 +102,7 @@ public class Point implements IShape, Cloneable
 		return false;
 	}
 
-	// µãµÄÖÐÐÄ¾ÍÊÇÆä×ø±êµã¡£
+	// ç‚¹çš„ä¸­å¿ƒå°±æ˜¯å…¶åæ ‡ç‚¹ã€‚
 	public double[] getCenter()
 	{
 		double[] pCoords = new double[m_pCoords.length];
@@ -120,13 +120,13 @@ public class Point implements IShape, Cloneable
 		return new Region(m_pCoords, m_pCoords);
 	}
 
-	// µãÃ»ÓÐÃæ»ý
+	// ç‚¹æ²¡æœ‰é¢ç§¯
 	public double getArea()
 	{
 		return 0.0f;
 	}
 
-	// ²éÑ¯²Ù×÷ÖÐ£¬·µ»Ø¾àÀë
+	// æŸ¥è¯¢æ“ä½œä¸­ï¼Œè¿”å›žè·ç¦»
 	public double getMinimumDistance(final IShape s)
 	{
 		if (s instanceof Region) return ((Region) s).getMinimumDistance(this);
@@ -136,7 +136,7 @@ public class Point implements IShape, Cloneable
 		throw new IllegalStateException("getMinimumDistance: Not implemented yet!");
 	}
 
-	// ¸÷¸öÎ¬¶ÈÉÏµãµ½µãÖ®¼äµÄ¾àÀë£¬¹´¹É¶¨Àí¼°ÆäÍØÕ¹
+	// å„ä¸ªç»´åº¦ä¸Šç‚¹åˆ°ç‚¹ä¹‹é—´çš„è·ç¦»ï¼Œå‹¾è‚¡å®šç†åŠå…¶æ‹“å±•
 	double getMinimumDistance(final Point p)
 	{
 		if (m_pCoords.length != p.m_pCoords.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -151,7 +151,7 @@ public class Point implements IShape, Cloneable
 		return Math.sqrt(ret);
 	}
 
-	// »ñµÃµãÔÚÖ¸¶¨Î¬¶ÈÉÏµÄ×ø±ê
+	// èŽ·å¾—ç‚¹åœ¨æŒ‡å®šç»´åº¦ä¸Šçš„åæ ‡
 	public double getCoord(int index) throws IndexOutOfBoundsException
 	{
 		if (index >= m_pCoords.length) throw new IndexOutOfBoundsException("" + index);

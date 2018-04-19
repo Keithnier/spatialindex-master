@@ -56,7 +56,7 @@ public abstract class DBBuffer {
 	 * @return  the four I/Os
 	 */
 	public int[] getIOs() {
-		// 以整型数组的形式，存储IO的状态，统计并报告I/O次数，可能用于性能分析
+		// 浠ユ暣鍨嬫暟缁勭殑褰㈠紡锛屽瓨鍌↖O鐨勭姸鎬侊紝缁熻骞舵姤鍛奍/O娆℃暟锛屽彲鑳界敤浜庢�ц兘鍒嗘瀽
 		int[] io = new int[4];
 		io[0] += diskReadIO;
 		io[1] += diskWriteIO;
@@ -106,7 +106,7 @@ public abstract class DBBuffer {
 	 * Resets the four counters <code>bufferReadIO</code>, etc.
 	 */
 	public void clearIOs(){
-		// 清除I/O操作次数统计
+		// 娓呴櫎I/O鎿嶄綔娆℃暟缁熻
 		bufferReadIO = 0;
 		bufferWriteIO = 0;
 		diskReadIO = 0;
@@ -123,7 +123,7 @@ public abstract class DBBuffer {
 	 * @throws IOException
 	 */
 	public DBBufferReturnElement readPage(RandomAccessFile file, long pageID) throws IOException {
-		// 返回一个缓冲页，如果在缓冲中，直接返回，否则就从硬盘上返回
+		// 杩斿洖涓�涓紦鍐查〉锛屽鏋滃湪缂撳啿涓紝鐩存帴杩斿洖锛屽惁鍒欏氨浠庣‖鐩樹笂杩斿洖
 		bufferReadIO ++;
 
 		DBBufferStoredElement stored = find(file, pageID);

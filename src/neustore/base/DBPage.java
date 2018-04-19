@@ -11,8 +11,8 @@ import neustore.base.ByteArray;
  * a byte array, and to <code>write</code> to a byte array. 
  * A convention is that in the byte array, the first integer should be nodeType.
  *
- * ¸Ã×Ö½ÚÊı×éÖĞµÚÒ»¸öÕûĞÍÊıÓ¦µ±ÊÇ½áµãÀàĞÍ£¬ 0±íÊ¾¿Õ°×Ò³£¬-1±íÊ¾ÄÚ´æÒ³£¬ÆäËûÎªÓÃ»§×Ô¶¨Òå
- * ¿Õ°×Ò³ÖĞµÚÒ»¸öÕûĞÍÎª0£¬Ö®ºóÎªÏÂÒ»¸ö¿Õ°×Ò³µÄºÅ£¬×îºóÒ»¸ö¿Õ°×Ò³¸ÃpointerÎª-1
+ * è¯¥å­—èŠ‚æ•°ç»„ä¸­ç¬¬ä¸€ä¸ªæ•´å‹æ•°åº”å½“æ˜¯ç»“ç‚¹ç±»å‹ï¼Œ 0è¡¨ç¤ºç©ºç™½é¡µï¼Œ-1è¡¨ç¤ºå†…å­˜é¡µï¼Œå…¶ä»–ä¸ºç”¨æˆ·è‡ªå®šä¹‰
+ * ç©ºç™½é¡µä¸­ç¬¬ä¸€ä¸ªæ•´å‹ä¸º0ï¼Œä¹‹åä¸ºä¸‹ä¸€ä¸ªç©ºç™½é¡µçš„å·ï¼Œæœ€åä¸€ä¸ªç©ºç™½é¡µè¯¥pointerä¸º-1
  *
  * @author Tian Xia &lt;tianxia@ccs.neu.edu&gt;<br>Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */

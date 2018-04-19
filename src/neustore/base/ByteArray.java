@@ -18,8 +18,8 @@ public class ByteArray {
 
 	private ByteArrayInputStream byte_in = null;
 	private DataInputStream in = null;
-	private byte[] buf = null; //Ò»¿éÄÚ´æ£¬¼´Ò»¿é´æ´¢¿Õ¼ä
-	private int offset = 0; // ÄÚ´æ¿Õ¼äÖĞµÄ×Ö½ÚÆ«ÒÆÁ¿
+	private byte[] buf = null; //ä¸€å—å†…å­˜ï¼Œå³ä¸€å—å­˜å‚¨ç©ºé—´
+	private int offset = 0; // å†…å­˜ç©ºé—´ä¸­çš„å­—èŠ‚åç§»é‡
 
 	/**
 	 * Constructor.
@@ -27,7 +27,7 @@ public class ByteArray {
 	 * @param isRead   whether to read or write
 	 */
 	public ByteArray( byte[] _buf, boolean isRead ) {
-		//Èç¹û¿É¶Á£¬ÄÇÃ´¾Í²úÉúÒ»¸öÊäÈëÁ÷
+		//å¦‚æœå¯è¯»ï¼Œé‚£ä¹ˆå°±äº§ç”Ÿä¸€ä¸ªè¾“å…¥æµ
 		if ( isRead ) {
 			byte_in = new ByteArrayInputStream(_buf);
 			in = new DataInputStream(byte_in);

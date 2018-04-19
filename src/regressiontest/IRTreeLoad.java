@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 public class IRTreeLoad {
     public static void main(String[] args) {
         System.out.println("Load Start!!");
-        System.out.println("ÇëÒÀ´ÎÊäÈë: input_file tree_file capacity query_type invertedIndex_filename");
+        System.out.println("è¯·ä¾æ¬¡è¾“å…¥: input_file tree_file capacity query_type invertedIndex_filename");
         Scanner in = new Scanner(System.in);
         String input = in.nextLine();
         String[] inputList = input.split(" ");
@@ -26,32 +26,32 @@ public class IRTreeLoad {
 
             lr = new LineNumberReader(new FileReader(inputList[0]));
 
-            // ¹¹½¨´æ´¢¹ÜÀíÆ÷ÊôĞÔ
+            // æ„å»ºå­˜å‚¨ç®¡ç†å™¨å±æ€§
             PropertySet ps = new PropertySet();
-            // Èç¹ûÎÄ¼ş´æÔÚ£¬ÔòÖØĞ´
+            // å¦‚æœæ–‡ä»¶å­˜åœ¨ï¼Œåˆ™é‡å†™
             ps.setProperty("Overwrite", new Boolean(true));
-            // ÎÄ¼şÃû Ìí¼Ó.idxÎÄ¼şºÍ.datÎÄ¼ş
+            // æ–‡ä»¶å æ·»åŠ .idxæ–‡ä»¶å’Œ.datæ–‡ä»¶
             ps.setProperty("FileName", inputList[1]);
-            // ÅäÖÃÒ³Ãæ´óĞ¡
+            // é…ç½®é¡µé¢å¤§å°
             ps.setProperty("PageSize", new Integer(4096));
 
-            // Ñ¡Ôñ´ÅÅÌ´æ´¢¹ÜÀíÆ÷
+            // é€‰æ‹©ç£ç›˜å­˜å‚¨ç®¡ç†å™¨
             IStorageManager diskfile = new DiskStorageManager(ps);
 
-            // ´ÓÄÚ´æ»ò´ÅÅÌµÃµ½»º´æÇø
+            // ä»å†…å­˜æˆ–ç£ç›˜å¾—åˆ°ç¼“å­˜åŒº
             IBuffer file = new RandomEvictionsBuffer(diskfile, 10, false);
 
-            // ÅäÖÃIRTreeË÷Òı
+            // é…ç½®IRTreeç´¢å¼•
             PropertySet ps2 = new PropertySet();
-            // Ê¹ÓÃRTreeµÄÍ¨ÓÃÅäÖÃ£¬µ¹ÅÅË÷Òıµ¥¶ÀÅäÖÃ
+            // ä½¿ç”¨RTreeçš„é€šç”¨é…ç½®ï¼Œå€’æ’ç´¢å¼•å•ç‹¬é…ç½®
             ps2.setProperty("BufferSize", new Integer(4096));
             ps2.setProperty("PageSize", new Integer(4096));
             ps2.setProperty("FileName", new String(inputList[4]));
 
-            // ¹¹½¨IRTree
+            // æ„å»ºIRTree
             ISpatialIndex tree = new IRTree(ps2, file, false);
 
-            // ²âÊÔ
+            // æµ‹è¯•
             int id, op;
             int count = 0;
             double x1, x2, y1, y2;
@@ -94,7 +94,7 @@ public class IRTreeLoad {
 
                     String data = r.toString();
 
-                    //½«Êı¾İ´æÔÚÊı¾İ¿â»òÕßÍâ´æ£¬ÄÚ´æÖĞ´æÎªnull
+                    //å°†æ•°æ®å­˜åœ¨æ•°æ®åº“æˆ–è€…å¤–å­˜ï¼Œå†…å­˜ä¸­å­˜ä¸ºnull
                     tree.insertData(null, r, id);
                     // example of passing a null pointer as the associated data.
                 }

@@ -67,7 +67,7 @@ public class Region implements IShape
 		System.arraycopy(r.m_pHigh, 0, m_pHigh, 0, r.m_pHigh.length);
 	}
 
-	// Í¬Ò»Î¬¶ÈÏÂµÄ×ø±êÏàµÈ£¬ÕâÈÏÎªÊÇÏàµÈµÄ
+	// åŒä¸€ç»´åº¦ä¸‹çš„åæ ‡ç›¸ç­‰ï¼Œè¿™è®¤ä¸ºæ˜¯ç›¸ç­‰çš„
 	public boolean equals(Object o)
 	{
 		if (o instanceof Region)
@@ -127,7 +127,7 @@ public class Region implements IShape
 		throw new IllegalStateException("touches: Not implemented yet!");
 	}
 
-	// ¸÷¸öÎ¬¶È×ø±êÈ¥ÖĞÖµ
+	// å„ä¸ªç»´åº¦åæ ‡å»ä¸­å€¼
 	public double[] getCenter()
 	{
 		double[] pCoords = new double[m_pLow.length];
@@ -150,7 +150,7 @@ public class Region implements IShape
 		return new Region(m_pLow, m_pHigh);
 	}
 
-	// ¸÷¸öÎ¬¶ÈÉÏ³¤¶ÈµÄ³Ë»ı
+	// å„ä¸ªç»´åº¦ä¸Šé•¿åº¦çš„ä¹˜ç§¯
 	public double getArea()
 	{
 		double area = 1.0;
@@ -207,7 +207,7 @@ public class Region implements IShape
 		return false;
 	}
 
-	// ¹´¹É¶¨Àí£¬»¹ÓĞÊ²Ã´ºÃËµµÄÄØ£¡
+	// å‹¾è‚¡å®šç†ï¼Œè¿˜æœ‰ä»€ä¹ˆå¥½è¯´çš„å‘¢ï¼
 	public double getMinimumDistance(final Region r)
 	{
 		if (m_pLow.length != r.m_pLow.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -233,7 +233,7 @@ public class Region implements IShape
 		return Math.sqrt(ret);
 	}
 
-	// µãµÄÃ¿Ò»¸öÎ¬¶ÈµÄ×ø±ê¶¼ÔÚRegion·¶Î§ÄÚ£¬ÔòÈÏÎªÊÇ°üº¬
+	// ç‚¹çš„æ¯ä¸€ä¸ªç»´åº¦çš„åæ ‡éƒ½åœ¨RegionèŒƒå›´å†…ï¼Œåˆ™è®¤ä¸ºæ˜¯åŒ…å«
 	public boolean contains(final Point p)
 	{
 		if (m_pLow.length != p.m_pCoords.length) throw new IllegalArgumentException("contains: Shape has the wrong number of dimensions.");
@@ -258,7 +258,7 @@ public class Region implements IShape
 		return false;
 	}
 
-	// ¹´¹É¶¨Àí
+	// å‹¾è‚¡å®šç†
 	public double getMinimumDistance(final Point p)
 	{
 		if (m_pLow.length != p.m_pCoords.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
@@ -322,7 +322,7 @@ public class Region implements IShape
 		return new Region(mn, mx);
 	}
 
-	// ·¶Î§ºÏ²¢
+	// èŒƒå›´åˆå¹¶
 	public static Region combinedRegion(Region[] pRegions)
 	{
 		double[] mn = new double[pRegions[0].m_pLow.length];
@@ -355,7 +355,7 @@ public class Region implements IShape
 		}
 	}
 
-	//·µ»Ø±ß½ç
+	//è¿”å›è¾¹ç•Œ
 	// Returns the margin of a region. It is calcuated as the sum of  2^(d-1) * width in each dimension.
 	public double getMargin()
 	{
@@ -385,7 +385,7 @@ public class Region implements IShape
 	public String toString()
 	{
 		String s = "";
-		//Ê¹ÓÃStingBuilderºÃÒ»µã
+		//ä½¿ç”¨StingBuilderå¥½ä¸€ç‚¹
 		for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) s += m_pLow[cIndex] + " ";
 
 		s += ": ";

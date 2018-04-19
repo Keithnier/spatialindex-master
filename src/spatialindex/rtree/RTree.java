@@ -133,6 +133,7 @@ public class RTree implements ISpatialIndex
 		m_infiniteRegion = new Region();
 		m_stats = new Statistics();
 
+
 		Object var = ps.getProperty("IndexIdentifier");
 		if (var != null)
 		{
@@ -160,6 +161,7 @@ public class RTree implements ISpatialIndex
 				throw new IllegalStateException("initNew failed with IOException");
 			}
 			Integer i = new Integer(m_headerID);
+//			System.out.println(i);
 			ps.setProperty("IndexIdentifier", i);
 		}
 	}
@@ -778,6 +780,7 @@ public class RTree implements ISpatialIndex
 		DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));
 
 		m_rootID = ds.readInt();
+//		System.out.println("m_rootID: " + m_rootID);
 		m_treeVariant = ds.readInt();
 		m_fillFactor = ds.readDouble();
 		m_indexCapacity = ds.readInt();
@@ -1076,7 +1079,7 @@ public class RTree implements ISpatialIndex
 		// Create a disk based storage manager.
 		PropertySet ps = new PropertySet();
 
-		Boolean b = new Boolean(true);
+		Boolean b = new Boolean(false);
 		ps.setProperty("Overwrite", b);
 		//overwrite the file if it exists.
 

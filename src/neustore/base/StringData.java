@@ -9,7 +9,7 @@ import java.io.IOException;
  * Note that to write a StringData to disk, the occupied size is four bytes
  * larger than the String size, for we also store the size of the String. 
  *
- * ×Ö·û´®ÀàĞÍµÄÊı¾İ´æ´¢£¬±È×Ö·û´®´óĞ¡´óËÄ¸ö×Ö½Ú£¬ÒòÎª½«×Ö·û´®µÄ³¤¶ÈÒ²´æ´¢ÁË¡£
+ * å­—ç¬¦ä¸²ç±»å‹çš„æ•°æ®å­˜å‚¨ï¼Œæ¯”å­—ç¬¦ä¸²å¤§å°å¤§å››ä¸ªå­—èŠ‚ï¼Œå› ä¸ºå°†å­—ç¬¦ä¸²çš„é•¿åº¦ä¹Ÿå­˜å‚¨äº†ã€‚
  *
  * @author Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */

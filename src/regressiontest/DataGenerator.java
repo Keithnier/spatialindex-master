@@ -3,11 +3,12 @@ package regressiontest;
 import java.io.*;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class BTreeDataGenerator {
+public class DataGenerator {
     public static void main(String[] args) throws IOException {
-        System.out.println("Usage: fileName(Êı¾İÎÄ¼şÃû) docNum(ÎÄµµÊıÄ¿) wordRange(¹Ø¼ü´Êid·¶Î§)");
+        System.out.println("Usage: fileName(æ•°æ®æ–‡ä»¶å) docNum(æ–‡æ¡£æ•°ç›®) wordRange(å…³é”®è¯idèŒƒå›´)");
         Scanner in = new Scanner(System.in);
         String line = in.nextLine();
         while(line == null || line.equals(""))
@@ -29,9 +30,9 @@ public class BTreeDataGenerator {
             StringBuilder line1 = new StringBuilder();
             line1.append(String.valueOf(i));
             line1.append(",");
-            line1.append(String.valueOf(rand.nextDouble()));
+            line1.append(String.valueOf(rand.nextFloat()));
             line1.append(",");
-            line1.append(String.valueOf(rand.nextDouble()));
+            line1.append(String.valueOf(rand.nextFloat()));
             line1.append(",");
             int wordNum = rand.nextInt(20);
             for(int j = 0; j < wordNum; j++) {
@@ -44,5 +45,22 @@ public class BTreeDataGenerator {
             pw.println(line1.toString());
         }
         pw.close();
+    }
+
+    public static void displayData() throws IOException {
+        System.out.println("è¯·è¾“å…¥æ–‡ä»¶å:");
+        Scanner in = new Scanner(System.in);
+        String tmp = in.nextLine();
+        String filepath = System.getProperty("user.dir") + File.separator + "src" +
+                File.separator + "regressiontest" + File.separator + "test3" + File.separator + tmp + ".gz";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new GZIPInputStream(new FileInputStream(filepath))
+        ));
+        String line;
+        int counter = 0;
+        while((line = reader.readLine()) != null) {
+            System.out.println(counter++ + ":\t" +line);
+        }
+        reader.close();
     }
 }

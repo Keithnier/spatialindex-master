@@ -5,12 +5,12 @@
 <pre>
                /**
 		 *  B树data文件格式
-		 *  id,?,?,wordID weight,wordID weight,...\n
-		 *  id,?,?,wordID weight,wordID weight,...\n
+		 *  id,floatX,floatY,wordID weight,wordID weight,...\n
+		 *  id,floatX,floatY,wordID weight,wordID weight,...\n
 		 *  ...
 		 */
 </pre>
-其中,?表示两个double类型的变量，暂时不知道具体作用是什么，后面会补充。
+其中,两个float类型的变量，用来表示地理坐标，暂时不知道具体作用是什么，后面会补充。
 </li>
 <li><b>invertedindex/InvertedIndex.java</b>在建立倒排索引的过程中，会读取1中的文件。并利用该文件建立倒排列表。下面给出倒排索引结构：
 <pre>倒排索引结构：

@@ -1,9 +1,6 @@
 package spatialindex.rtree;
  
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 
@@ -19,7 +16,7 @@ import neustore.base.KeyData;
 import spatialindex.spatialindex.Point;
 
 /**
- * BTreeStore用来管理关键字在文档中的权重
+ * BTreeStore鐢ㄦ潵绠＄悊鍏抽敭瀛楀湪鏂囨。涓殑鏉冮噸
  */
 public class BtreeStore {
 
@@ -33,12 +30,50 @@ public class BtreeStore {
     	
     	if ( !isCreate ) {
 			recid = cacheRecordManager.getNamedObject( "0" );
-	    	btree = BTree.load( cacheRecordManager, recid );
+//			System.out.println("real btree id " + recid);
+			btree = BTree.load( cacheRecordManager, recid );
 	    } 
 	    else {
 	        btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 200 );
 	        cacheRecordManager.setNamedObject( "0", btree.getRecid() );	          
 	    }
+	}
+
+	public static BtreeStore process(String inputFileName, String btreeName) throws Exception {
+		BtreeStore bs = new BtreeStore(btreeName, true);
+		inputFileName = System.getProperty("user.dir") + File.separator + "src" +
+				File.separator + "regressiontest" + File.separator + "test3" + File.separator + inputFileName + ".gz";
+		BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(inputFileName))));
+
+		String line;
+		String[] temp;
+		int count = 0;
+		while((line = in.readLine()) != null) {
+			temp = line.split(",");
+			int id = Integer.parseInt(temp[0]);
+
+			Vector<KeyData> document = new Vector<>();
+			for(int i = 3; i < temp.length; i++) {
+				String[] kv = temp[i].split(" ");
+				int wordID = Integer.parseInt(kv[0]);
+				float weight = Float.parseFloat(kv[1]);
+				IntKey key = new IntKey(wordID);
+				FloatData data = new FloatData(weight,weight);
+				KeyData keydata = new KeyData(key, data);
+				document.add(keydata);
+			}
+			bs.insertDoc(id, document);
+
+			if(count % 100 == 0){
+				System.out.println(count);
+				bs.cacheRecordManager.commit();
+			}
+			count++;
+		}
+		bs.cacheRecordManager.commit();
+		in.close();
+		System.out.println("Step one finished");
+		return bs;
 	}
 
 	public static void main(String[] args)throws Exception{
@@ -63,7 +98,7 @@ public class BtreeStore {
 		int count = 0;
 
 		/**
-		 *  B树data文件格式
+		 *  B鏍慸ata鏂囦欢鏍煎紡
 		 *  id,?,?,wordID weight,wordID weight,...\n
 		 *  id,?,?,wordID weight,wordID weight,...\n
 		 *  ...

@@ -34,7 +34,7 @@ package spatialindex.spatialindex;
 import java.util.*;
 
 /**
- * ¶ÁĞ´Ëø
+ * è¯»å†™é”
  */
 public class RWLock
 {

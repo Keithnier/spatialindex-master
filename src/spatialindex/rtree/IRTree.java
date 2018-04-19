@@ -55,7 +55,6 @@ public class IRTree extends RTree{
 	
 	public void buildInvertedIndex(BtreeStore docstore)throws Exception{
 		count = 0;
-
 		Node n = readNode(m_rootID);
 		post_traversal_iindex(n, docstore);
 	}
@@ -3035,12 +3034,12 @@ public class IRTree extends RTree{
 		i = new Integer(1); // INDEX_IDENTIFIER_GOES_HERE (suppose I know that in this case it is equal to 1);
 		ps.setProperty("IndexIdentifier", i);
 
-		IRTree irtree = new IRTree(ps, file, true);
-		
-		
+		IRTree irtree = new IRTree(ps, file, false);
+
 		long start = System.currentTimeMillis();
+//		irtree.build("src/regressiontest/test3/dataOfBtree.gz", "irtree", 100, 4096);
 		irtree.buildInvertedIndex(docstore);
-		
+
 		long end = System.currentTimeMillis();
 		boolean ret = irtree.isIndexValid();
 		if (ret == false) System.err.println("Structure is INVALID!");

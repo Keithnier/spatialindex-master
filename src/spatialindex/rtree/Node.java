@@ -38,7 +38,7 @@ abstract class Node implements INode
 {
 	protected RTree m_pTree = null;
 		// Parent of all nodes.
-	//Õâ¸ö½ÚµãÓĞÊ²Ã´ÓÃ£¿
+	//è¿™ä¸ªèŠ‚ç‚¹æœ‰ä»€ä¹ˆç”¨ï¼Ÿ
 
 	protected int m_level = -1;
 		// The level of the node in the tree.
@@ -51,7 +51,7 @@ abstract class Node implements INode
 
 	protected int m_children = 0;
 		// The number of children pointed by this node.
-		// Í¬Ê±¸ÃÊıÖµÒ²ÊÇĞÂ²åÈëÊı¾İµÄË÷ÒıÖµ
+		// åŒæ—¶è¯¥æ•°å€¼ä¹Ÿæ˜¯æ–°æ’å…¥æ•°æ®çš„ç´¢å¼•å€¼
 
 	protected int m_capacity = -1;
 		// Specifies the node capacity.
@@ -61,22 +61,22 @@ abstract class Node implements INode
 
 	protected byte[][] m_pData = null;
 		// The data stored in the node.
-		// ¶şÎ¬byteÊı×é´æ´¢Êı¾İ£¬Êı¾İĞÎÊ½ÊÇÊ²Ã´£¿
+		// äºŒç»´byteæ•°ç»„å­˜å‚¨æ•°æ®ï¼Œæ•°æ®å½¢å¼æ˜¯ä»€ä¹ˆï¼Ÿ
 
 	protected Region[] m_pMBR = null;
 		// The corresponding data MBRs.
-		// ÎªÊ²Ã´ÓĞÁ½¸öMBR?
-		// Êı×éĞÎÊ½±íÊ¾Æä×Ó½áµãµÄĞÅÏ¢
+		// ä¸ºä»€ä¹ˆæœ‰ä¸¤ä¸ªMBR?
+		// æ•°ç»„å½¢å¼è¡¨ç¤ºå…¶å­ç»“ç‚¹çš„ä¿¡æ¯
 
 	protected int[] m_pIdentifier = null;
 		// The corresponding data identifiers.
-		// Á½¸öidentifiers?
-		// ÓÃÊı¾İ´æ´¢Æ÷×Ó½áµãµÄĞÅÏ¢
+		// ä¸¤ä¸ªidentifiers?
+		// ç”¨æ•°æ®å­˜å‚¨å™¨å­ç»“ç‚¹çš„ä¿¡æ¯
 
 	protected int[] m_pDataLength = null;
 
 	int m_totalDataLength = 0;
-	// ËùÓĞÊı¾İµÄ×Ü³¤¶È
+	// æ‰€æœ‰æ•°æ®çš„æ€»é•¿åº¦
 
 	//
 	// Abstract methods
@@ -113,7 +113,7 @@ abstract class Node implements INode
 	{
 		if (index < 0 || index >= m_children) throw new IndexOutOfBoundsException("" + index);
 
-		return m_pIdentifier[index];// ÊÇ·ñÓĞ±¾Éí½áµã±êÊ¶·ûÄØ?
+		return m_pIdentifier[index];// æ˜¯å¦æœ‰æœ¬èº«ç»“ç‚¹æ ‡è¯†ç¬¦å‘¢?
 	}
 
 	public IShape getChildShape(int index) throws IndexOutOfBoundsException
@@ -127,7 +127,7 @@ abstract class Node implements INode
 	{
 		return m_level;
 	}
-	// Ê÷ÖĞ·ÖÎªÁ½Àà½áµã£¬Ò»¸öÊÇÒ¶×Ó½Úµã£¬¶şÊÇË÷Òı½Úµã
+	// æ ‘ä¸­åˆ†ä¸ºä¸¤ç±»ç»“ç‚¹ï¼Œä¸€ä¸ªæ˜¯å¶å­èŠ‚ç‚¹ï¼ŒäºŒæ˜¯ç´¢å¼•èŠ‚ç‚¹
 	public boolean isLeaf()
 	{
 		return (m_level == 0);
@@ -150,7 +150,7 @@ abstract class Node implements INode
 		m_capacity = capacity;
 		m_nodeMBR = (Region) pTree.m_infiniteRegion.clone();
 
-		m_pDataLength = new int[m_capacity + 1]; // ÈİÁ¿´ú±íºó´úÊıÄ¿£¬+1±íÊ¾×ÔÉíĞÅÏ¢ÓĞ´æ´¢Âğ£¿
+		m_pDataLength = new int[m_capacity + 1]; // å®¹é‡ä»£è¡¨åä»£æ•°ç›®ï¼Œ+1è¡¨ç¤ºè‡ªèº«ä¿¡æ¯æœ‰å­˜å‚¨å—ï¼Ÿ
 		m_pData = new byte[m_capacity + 1][];
 		m_pMBR = new Region[m_capacity + 1];
 		m_pIdentifier = new int[m_capacity + 1];
@@ -169,7 +169,7 @@ abstract class Node implements INode
 		m_children++;
 
 		Region.combinedRegion(m_nodeMBR, mbr);
-		// ²åÈë½áµãºó£¬À©´ó×îĞ¡ÏŞ¶¨ÏäµÄ·¶Î§¡£Ê¹µÃ±¾½áµãµÄMBR°üº¬×Ó½áµãµÄMBR
+		// æ’å…¥ç»“ç‚¹åï¼Œæ‰©å¤§æœ€å°é™å®šç®±çš„èŒƒå›´ã€‚ä½¿å¾—æœ¬ç»“ç‚¹çš„MBRåŒ…å«å­ç»“ç‚¹çš„MBR
 	}
 
 	protected void deleteEntry(int index) throws IndexOutOfBoundsException
@@ -180,7 +180,7 @@ abstract class Node implements INode
 
 		m_totalDataLength -= m_pDataLength[index];
 		m_pData[index] = null;
-		// É¾³ı²Ù×÷£¬°Ñ×îºóÒ»¸ö½áµãµÄĞÅÏ¢ÒÆ¶¯µ½É¾³ıµÄË÷ÒıµÄÎ»ÖÃ¡£
+		// åˆ é™¤æ“ä½œï¼ŒæŠŠæœ€åä¸€ä¸ªç»“ç‚¹çš„ä¿¡æ¯ç§»åŠ¨åˆ°åˆ é™¤çš„ç´¢å¼•çš„ä½ç½®ã€‚
 		if (m_children > 1 && index != m_children - 1)
 		{
 			m_pDataLength[index] = m_pDataLength[m_children - 1];
@@ -222,7 +222,7 @@ abstract class Node implements INode
 
 			insertEntry(pData, mbr, id);
 			m_pTree.writeNode(this);
-			// µ÷ÕûÊ÷½á¹¹
+			// è°ƒæ•´æ ‘ç»“æ„
 			if (! b && ! pathBuffer.empty())
 			{
 				int cParent = ((Integer) pathBuffer.pop()).intValue();
@@ -395,7 +395,7 @@ abstract class Node implements INode
 			keep.add(new Integer(v[cCount].m_id));
 		}
 	}
-	// ·ÖÀëÊ÷
+	// åˆ†ç¦»æ ‘
 	protected void rtreeSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2)
 	{
 		int cChild;

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * A class that stores a pair of Key and Data.
- * ¼üÖµ¶Ô
+ * é”®å€¼å¯¹
  * @author Donghui Zhang &lt;donghui@ccs.neu.edu&gt;
  */
 public class KeyData implements Serializable{
