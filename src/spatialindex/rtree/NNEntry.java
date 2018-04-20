@@ -29,7 +29,7 @@ public class NNEntry implements Serializable{
 	 { m_pEntry = e; level = l; m_minDist = f; before = bb; after = aa;}
 	
 
-	public NNEntry(IEntry e, double f, int l) { m_pEntry = e; m_minDist = f; level = l;}
+	public NNEntry(IEntry m_pEntry, double m_minDist, int level) { this.m_pEntry = m_pEntry; this.m_minDist = m_minDist; this.level = level;}
 	
 	
 	public boolean pruned;

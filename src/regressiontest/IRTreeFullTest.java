@@ -1,10 +1,6 @@
 package regressiontest;
 
-import spatialindex.rtree.BtreeStore;
 import spatialindex.rtree.IRTree;
-import spatialindex.storagemanager.*;
-
-import java.io.File;
 
 public class IRTreeFullTest {
 //    public static void main(String[] args) throws Exception {
@@ -60,7 +56,7 @@ public class IRTreeFullTest {
 //    }
 
     public static void main(String[] args) throws Exception {
-        if(args.length != 5) {
+        if (args.length != 5) {
             System.err.println("Usage: IRTree docsFileName btreeName indexFileName fanout buffersize.");
             System.exit(-1);
         }
@@ -70,42 +66,6 @@ public class IRTreeFullTest {
         int fanout = Integer.parseInt(args[3]);
         int buffersize = Integer.parseInt(args[4]);
 
-        /**
-         * 1. 用BTree管理docs文件集
-         * 2. 利用docs文件集构建RTree索引层
-         * 3. 利用BTree的信息构建倒排索引
-         */
-        //1. BTree管理docs
-        BtreeStore bs = BtreeStore.process(docsFileName, btreeName);
-        // 2. 构造索引层
-            //索引文件管理器，磁盘
-        PropertySet ps = new PropertySet();
-            // .idx，.dat文件将被创建
-        ps.setProperty("FileName", indexFileName);
-
-        Integer pageSize = new Integer(4096 * fanout / 100);
-        ps.setProperty("PageSize", pageSize);
-
-        ps.setProperty("BufferSize", buffersize);
-
-        IStorageManager diskfile = new DiskStorageManager(ps);
-
-        IBuffer file = new TreeLRUBuffer(diskfile, buffersize, false);
-        
-        long start = System.currentTimeMillis();
-            // 先填充RTree
-        docsFileName = System.getProperty("user.dir") + File.separator + "src" +
-                File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
-        IRTree.build(docsFileName, indexFileName, fanout, buffersize);
-        IRTree irTree = new IRTree(ps, diskfile, false);
-            // 创建倒排索引
-        irTree.buildInvertedIndex(bs);
-        long end = System.currentTimeMillis();
-
-        boolean ret = irTree.isIndexValid();
-        if (ret == false) System.err.println("Structure is INVALID!");
-        irTree.close();
-
-        System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
+        IRTree.build(docsFileName, btreeName, indexFileName, fanout, buffersize);
     }
 }

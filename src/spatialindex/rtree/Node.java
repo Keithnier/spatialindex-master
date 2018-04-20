@@ -74,6 +74,7 @@ abstract class Node implements INode
 		// 用数据存储器子结点的信息
 
 	protected int[] m_pDataLength = null;
+		// 存储子结点中数据的长度
 
 	int m_totalDataLength = 0;
 	// 所有数据的总长度
@@ -149,7 +150,10 @@ abstract class Node implements INode
 		m_identifier = id;
 		m_capacity = capacity;
 		m_nodeMBR = (Region) pTree.m_infiniteRegion.clone();
-
+		/**
+		 * 每个节点的后代最大数目为capacity, 同时自身也是节点，所以自身的
+		 * 数据容量也是capacity
+		 */
 		m_pDataLength = new int[m_capacity + 1]; // 容量代表后代数目，+1表示自身信息有存储吗？
 		m_pData = new byte[m_capacity + 1][];
 		m_pMBR = new Region[m_capacity + 1];

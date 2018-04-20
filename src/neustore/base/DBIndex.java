@@ -83,7 +83,8 @@ public abstract class DBIndex {
 		if ( isCreate ) {
 			File f = new File(filename);
 			if (f.exists()) {
-				System.out.println("File exists! Can not create new file!"); System.exit(0);
+//				System.out.println("File exists! Can not create new file!"); System.exit(0);
+				f.delete();
 			}
 			file = new RandomAccessFile (f, "rw");
 

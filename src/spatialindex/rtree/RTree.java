@@ -1079,7 +1079,7 @@ public class RTree implements ISpatialIndex
 		// Create a disk based storage manager.
 		PropertySet ps = new PropertySet();
 
-		Boolean b = new Boolean(false);
+		Boolean b = new Boolean(true);
 		ps.setProperty("Overwrite", b);
 		//overwrite the file if it exists.
 
@@ -1133,13 +1133,13 @@ public class RTree implements ISpatialIndex
 			rtree.insertData(data, r, id);
 
 			count++;
-			if(count % 10000 == 0) System.out.println(count);
+//			if(count % 10000 == 0) System.out.println(count);
 		}
 
 		long end = System.currentTimeMillis();
 
 		System.err.println(rtree);
-		System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
+//		System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
 
 		boolean ret = rtree.isIndexValid();
 		if (ret == false) System.err.println("Structure is INVALID!");

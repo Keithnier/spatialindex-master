@@ -31,7 +31,7 @@ public class BtreeStore {
     	if ( !isCreate ) {
 			recid = cacheRecordManager.getNamedObject( "0" );
 //			System.out.println("real btree id " + recid);
-			btree = BTree.load( cacheRecordManager, recid );
+			btree = BTree.load( cacheRecordManager, recid);
 	    } 
 	    else {
 	        btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 200 );
@@ -41,8 +41,8 @@ public class BtreeStore {
 
 	public static BtreeStore process(String inputFileName, String btreeName) throws Exception {
 		BtreeStore bs = new BtreeStore(btreeName, true);
-		inputFileName = System.getProperty("user.dir") + File.separator + "src" +
-				File.separator + "regressiontest" + File.separator + "test3" + File.separator + inputFileName + ".gz";
+//		inputFileName = System.getProperty("user.dir") + File.separator + "src" +
+//				File.separator + "regressiontest" + File.separator + "test3" + File.separator + inputFileName + ".gz";
 		BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(inputFileName))));
 
 		String line;

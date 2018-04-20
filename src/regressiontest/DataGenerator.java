@@ -58,7 +58,7 @@ public class DataGenerator {
         ));
         String line;
         int counter = 0;
-        while((line = reader.readLine()) != null) {
+        while((line = reader.readLine()) != null && (counter < 5000)) {
             System.out.println(counter++ + ":\t" +line);
         }
         reader.close();
