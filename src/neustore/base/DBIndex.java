@@ -90,6 +90,7 @@ public abstract class DBIndex {
 
 			numPages = 0;
 			firstEmpty = -1;
+			// 记录数为0
 			initIndexHead();
 		}
 		else {

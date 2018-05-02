@@ -5,8 +5,8 @@
 <pre>
                /**
 		 *  B树data文件格式
-		 *  id,floatX,floatY,wordID weight,wordID weight,...\n
-		 *  id,floatX,floatY,wordID weight,wordID weight,...\n
+		 *  id,time,x1,y1,x2,y2,wordID weight,wordID weight,...\n
+		 *  id,time,x1,y1,x2,y2,wordID weight,wordID weight,...\n
 		 *  ...
 		 */
 </pre>
@@ -25,4 +25,11 @@
 <pre>score = (1-alpha)*(1-dist)+alpha*trs;</pre>
 其中alpha是权重调节因数，dist是查询点和实际结点的距离，由getMinimumDistance()返回，trs是TF(词频) / 5所得。
 </li>
+<li>
+</li>
 </ol>
+
+.iindex文件结构
+
+-1| pageSize| numOfPage | firstEmpty| indexHead(numRecs)
+---| --- |---|---|---
