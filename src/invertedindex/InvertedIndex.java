@@ -90,9 +90,9 @@ public class InvertedIndex extends DBIndex {
 
         int cachesize = buffersize;
         cacheRecordManager = new CacheRecordManager(RecordManagerFactory.createRecordManager(filename), cachesize, true);
+
         pageSize = pagesize;
 
-        //？？这里是不是缺少代码？BTree的处理呢？
     }
 
     protected void readIndexHead (byte[] indexHead) {
@@ -285,13 +285,16 @@ public class InvertedIndex extends DBIndex {
 //		System.out.println("true recid " + recid);
 //		System.out.println(recid);
         if ( recid != 0 ) {
-            System.out.println("Creating an existing btree: " + treeid);
-            System.exit(-1);
+            cacheRecordManager.delete(recid);
+//            System.out.println("Creating an existing btree: " + treeid);
+//            System.exit(-1);
         }
-        else {
-            btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 1000 );
-            cacheRecordManager.setNamedObject( BTREE_NAME, btree.getRecid() );
-        }
+//        else {
+//            btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 1000 );
+//            cacheRecordManager.setNamedObject( BTREE_NAME, btree.getRecid() );
+//        }
+        btree = BTree.createInstance( cacheRecordManager, ComparableComparator.INSTANCE, DefaultSerializer.INSTANCE, DefaultSerializer.INSTANCE, 1000 );
+        cacheRecordManager.setNamedObject( BTREE_NAME, btree.getRecid() );
     }
 
     public void load(int treeid)throws IOException{
