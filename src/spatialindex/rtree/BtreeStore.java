@@ -39,40 +39,42 @@ public class BtreeStore {
 	    }
 	}
 
-	public static BtreeStore process(String inputFileName, String btreeName) throws Exception {
-		BtreeStore bs = new BtreeStore(btreeName, true);
+	public static BtreeStore process(String inputFileName, String btreeName, boolean isCreate) throws Exception {
+		BtreeStore bs = new BtreeStore(btreeName, isCreate);
 //		inputFileName = System.getProperty("user.dir") + File.separator + "src" +
 //				File.separator + "regressiontest" + File.separator + "test3" + File.separator + inputFileName + ".gz";
-		BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(inputFileName))));
+		if(isCreate) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(inputFileName))));
 
-		String line;
-		String[] temp;
-		int count = 0;
-		while((line = in.readLine()) != null) {
-			temp = line.split(",");
-			int id = Integer.parseInt(temp[0]);
+			String line;
+			String[] temp;
+			int count = 0;
+			while((line = in.readLine()) != null) {
+				temp = line.split(",");
+				int id = Integer.parseInt(temp[0]);
 
-			Vector<KeyData> document = new Vector<>();
-			for(int i = 3; i < temp.length; i++) {
-				String[] kv = temp[i].split(" ");
-				int wordID = Integer.parseInt(kv[0]);
-				float weight = Float.parseFloat(kv[1]);
-				IntKey key = new IntKey(wordID);
-				FloatData data = new FloatData(weight,weight);
-				KeyData keydata = new KeyData(key, data);
-				document.add(keydata);
+				Vector<KeyData> document = new Vector<>();
+				for(int i = 6; i < temp.length; i++) {
+					String[] kv = temp[i].split(" ");
+					int wordID = Integer.parseInt(kv[0]);
+					float weight = Float.parseFloat(kv[1]);
+					IntKey key = new IntKey(wordID);
+					FloatData data = new FloatData(weight,weight);
+					KeyData keydata = new KeyData(key, data);
+					document.add(keydata);
+				}
+				bs.insertDoc(id, document);
+
+				if(count % 100 == 0){
+					System.out.println(count);
+					bs.cacheRecordManager.commit();
+				}
+				count++;
 			}
-			bs.insertDoc(id, document);
-
-			if(count % 100 == 0){
-				System.out.println(count);
-				bs.cacheRecordManager.commit();
-			}
-			count++;
+			bs.cacheRecordManager.commit();
+			in.close();
 		}
-		bs.cacheRecordManager.commit();
-		in.close();
-		System.out.println("Step one finished");
+//		System.out.println("Step one finished");
 		return bs;
 	}
 

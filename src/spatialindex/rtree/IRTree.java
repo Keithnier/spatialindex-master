@@ -30,6 +30,7 @@ public class IRTree extends RTree {
     public void buildInvertedIndex(BtreeStore docstore) throws Exception {
         count = 0;
         Node n = readNode(m_rootID);
+//        System.err.println(m_rootID);
         post_traversal_iindex(n, docstore);
     }
 
@@ -2756,8 +2757,10 @@ public class IRTree extends RTree {
         }
 
 
-        if (count == topk)
+        if (count == topk) {
+            m_stats.m_queryResults = line.size();
             return line;
+        }
         return null;
     }
 
@@ -2899,7 +2902,7 @@ public class IRTree extends RTree {
         return ans;
     }
 
-    public static void build(String docsFileName, String btreeName, String indexFileName, int fanout, int buffersize) throws Exception {
+    public static void build(String docsFileName, String btreeName, String indexFileName, int fanout, int buffersize, boolean isCreate) throws Exception {
         docsFileName = System.getProperty("user.dir") + File.separator + "src" +
                 File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
         BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
@@ -2909,7 +2912,7 @@ public class IRTree extends RTree {
          * 3. 利用BTree的信息构建倒排索引
          */
         //1. BTree管理docs
-        BtreeStore bs = BtreeStore.process(docsFileName, btreeName);
+        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
         // 2. 构造索引层
         //索引文件管理器，磁盘
         PropertySet ps = new PropertySet();
@@ -2918,47 +2921,59 @@ public class IRTree extends RTree {
         Integer pageSize = new Integer(4096 * fanout / 100);
         ps.setProperty("PageSize", pageSize);
         ps.setProperty("BufferSize", buffersize);
+        ps.setProperty("Overwrite", isCreate);
 
         IStorageManager diskfile = new DiskStorageManager(ps);
         IBuffer file = new TreeLRUBuffer(diskfile, buffersize, false);
 
-        ps.setProperty("Overwrite", true);
         ps.setProperty("FillFactor", 0.7);
         ps.setProperty("IndexCapacity", fanout);
         ps.setProperty("LeafCapacity", fanout);
-        ps.setProperty("Dimension", 2);
+        ps.setProperty("Dimension", 3);
 
-        IRTree irTree = new IRTree(ps, file, true);
+        // 如果.idx文件已经建立，该值为m_header的页号
+        if(!isCreate)
+            ps.setProperty("IndexIdentifier", 1);
 
-        String line;
-        String[] temp;
-        int count = 0;
-        double[] f1 = new double[2];
-        double[] f2 = new double[2];
-        long start = System.currentTimeMillis();
-        while((line = reader.readLine()) != null) {
-            temp = line.split(",");
-            int docId = Integer.parseInt(temp[0]);
-            float x = Float.parseFloat(temp[1]);
-            float y = Float.parseFloat(temp[2]);
+        IRTree irTree = new IRTree(ps, file, isCreate);
 
-            f1[0] = f2[0] = x;
-            f1[1] = f2[1] = y;
-            Region region = new Region(f1, f2);
+        if(isCreate) {
+            String line;
+            String[] temp;
+            int count = 0;
+            double[] f1 = new double[3];
+            double[] f2 = new double[3];
+            long start = System.currentTimeMillis();
+            while((line = reader.readLine()) != null) {
+                temp = line.split(",");
+                int docId = Integer.parseInt(temp[0]);
+                float time = Float.parseFloat(temp[1]);
+                float x1 = Float.parseFloat(temp[2]);
+                float y1 = Float.parseFloat(temp[3]);
+                float x2 = Float.parseFloat(temp[4]);
+                float y2 = Float.parseFloat(temp[5]);
 
-            byte[] data = new byte[100];
+//                f1[0] = f2[0] = x;
+//                f1[1] = f2[1] = y;
+                f1[0] = x1; f2[0] = x2;
+                f1[1] = y1; f2[1] = y2;
+                f1[2] = f2[2] = time;
+                Region region = new Region(f1, f2);
 
-            irTree.insertData(data, region, docId);
+                byte[] data = new byte[100];
 
-            count++;
-            if(count % 10000 == 0) System.out.println(count);
+                irTree.insertData(data, region, docId);
+
+                count++;
+                if(count % 10000 == 0) System.out.println(count);
+            }
+            irTree.buildInvertedIndex(bs);
+
+            long end = System.currentTimeMillis();
+            System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
+            boolean ret = irTree.isIndexValid();
+            if (ret == false) System.err.println("Structure is INVALID!");
         }
-        irTree.buildInvertedIndex(bs);
-
-        long end = System.currentTimeMillis();
-
-        boolean ret = irTree.isIndexValid();
-        if (ret == false) System.err.println("Structure is INVALID!");
 
 
         //Query
@@ -2967,12 +2982,14 @@ public class IRTree extends RTree {
 //        for(int i = 0; i < 5; i++) {
 //            qwords.add(rand.nextInt(100));
 //        }
-        qwords.add(233);
-        double[] f = new double[2];
+        qwords.add(121);
+        qwords.add(557);
+        double[] f = new double[3];
 //        f[0] = rand.nextDouble();
 //        f[1] = rand.nextDouble();
-        f[0] = 0.71;
-        f[1] = 0.37;
+        f[0] = (0.62 + 0.58 ) / 2;
+        f[1] = (0.59 + 0.464) / 2;
+        f[2] = 0.16;
         Point qp = new Point(f);
         ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
         if (list != null && list.size() > 0)
@@ -2980,7 +2997,5 @@ public class IRTree extends RTree {
         else System.out.println("Nothing has been found");
         System.err.println(irTree);
         irTree.close();
-        System.err.println("Minutes: " + ((end - start) / 1000.0f) / 60.0f);
     }
-
 }

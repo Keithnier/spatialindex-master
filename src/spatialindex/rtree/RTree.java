@@ -161,7 +161,7 @@ public class RTree implements ISpatialIndex
 				throw new IllegalStateException("initNew failed with IOException");
 			}
 			Integer i = new Integer(m_headerID);
-//			System.out.println(i);
+			System.err.println(i);
 			ps.setProperty("IndexIdentifier", i);
 		}
 	}

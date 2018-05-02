@@ -28,11 +28,17 @@ public class DataGenerator {
         Random rand = new Random();
         for(int i = 0; i < docNum; i++) {
             StringBuilder line1 = new StringBuilder();
-            line1.append(String.valueOf(i));
+            line1.append(String.valueOf(i)); // id
             line1.append(",");
-            line1.append(String.valueOf(rand.nextFloat()));
+            line1.append(String.valueOf(rand.nextFloat())); // time
             line1.append(",");
-            line1.append(String.valueOf(rand.nextFloat()));
+            line1.append(String.valueOf(rand.nextFloat())); // x1
+            line1.append(",");
+            line1.append(String.valueOf(rand.nextFloat())); // y1
+            line1.append(",");
+            line1.append(String.valueOf(rand.nextFloat())); // x2
+            line1.append(",");
+            line1.append(String.valueOf(rand.nextFloat())); // y2
             line1.append(",");
             int wordNum = rand.nextInt(20);
             for(int j = 0; j < wordNum; j++) {

@@ -65,7 +65,7 @@ public class IRTreeFullTest {
         String indexFileName = args[2];
         int fanout = Integer.parseInt(args[3]);
         int buffersize = Integer.parseInt(args[4]);
-
-        IRTree.build(docsFileName, btreeName, indexFileName, fanout, buffersize);
+        // 首次使用，boolean值为true
+        IRTree.build(docsFileName, btreeName, indexFileName, fanout, buffersize, false);
     }
 }
