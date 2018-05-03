@@ -32,6 +32,7 @@ package spatialindex.storagemanager;
 public interface IBuffer extends IStorageManager
 {
 	public long getHits();
+	public long getMisses();
 	public void clear();
 	public void flush();
 } // IBuffer

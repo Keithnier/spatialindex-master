@@ -13,8 +13,5 @@ public 	class NNEntryComparator implements Comparator
 		if (n1.m_minDist < n2.m_minDist) return 1;
 		if (n1.m_minDist > n2.m_minDist) return -1;
 		return 0;
-
-
-		
 	}
 }

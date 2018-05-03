@@ -225,7 +225,7 @@ public class InvertedIndex extends DBIndex {
                 KeyData rec = (KeyData)list.get(i);
                 IntKey docID = (IntKey)rec.key;
                 FloatData weight = (FloatData)rec.data;
-                // 统计文档中关键字出现的次数
+                // 统计文档中所有查询关键字出现的次数，其权重和相加
                 if(filter.containsKey(docID.key)){
                     FloatData w = (FloatData)filter.get(docID.key);
                     w.data  = w.data + weight.data;

@@ -2696,7 +2696,18 @@ public class IRTree extends RTree {
         }
     }
 
-
+    /**
+     * 查询流程：
+     * 1.从根结点开始，查询倒排索引，找到包含查询关键字的文档id
+     * 2.对于所有的子节点，如果包含候选文档id，那么就计算一个得分，存入优先级队列，否则跳过
+     * 3.从优先级队列中取出得分最高的结点，如果是内部结点，继续上述过程，否则是外部结点，则其为所求文档
+     * @param qwords 查询关键字集合
+     * @param qpoint 查询点坐标
+     * @param topk 查询返回结果个数
+     * @param alpha 空间和文本权重调节系数
+     * @return 返回查询结果
+     * @throws Exception
+     */
     public ArrayList<Integer> Find_AllO_Rank_K(Vector qwords, Point qpoint, int topk, double alpha) throws Exception {
 
         PriorityQueue<NNEntry> queue = new PriorityQueue<NNEntry>(100, new NNEntryComparator());
@@ -2707,7 +2718,7 @@ public class IRTree extends RTree {
         int count = 0;
         int object_id = 0;
         ArrayList<Integer> line = new ArrayList<Integer>();
-
+        // 根结点
         Node n = null;
         Data nd = new Data(null, null, m_rootID);
 
@@ -2718,11 +2729,14 @@ public class IRTree extends RTree {
 
             if (count >= topk && first.m_minDist < knearest) break;
 
+            //内部结点
             if (first.level > 0) {
                 IData fd = (IData) first.m_pEntry;
                 n = readNode(fd.getIdentifier());
 
                 iindex.load(n.m_identifier);
+
+                // 由查询关键字得到所有候选文档
                 Hashtable trscore = iindex.textRelevancy(qwords);
 
 
@@ -2730,7 +2744,6 @@ public class IRTree extends RTree {
                     Object var = trscore.get(n.m_pIdentifier[cChild]);
                     //////////////////////////////
                     if (var == null) {
-
                         continue;
                     }
                     FloatData trs = (FloatData) var;
@@ -2743,7 +2756,6 @@ public class IRTree extends RTree {
                     double score = (1 - alpha) * (1 - dist) + alpha * trs.data;
                     NNEntry e2 = new NNEntry(e, score, n.m_level, 1 - dist, trs.data);
                     queue.add(e2);
-
                 }
             } else {
                 //System.out.println(first.m_pEntry.getIdentifier() + ":" + first.m_minDist);
@@ -2752,8 +2764,8 @@ public class IRTree extends RTree {
                 knearest = first.m_minDist;
 //                if (count > 10) line.add(object_id);
                 line.add(object_id);
+//                System.err.println(String.format("id %d\tscore %f",first.m_pEntry.getIdentifier(), first.m_minDist));
             }
-
         }
 
 
@@ -2912,7 +2924,8 @@ public class IRTree extends RTree {
          * 3. 利用BTree的信息构建倒排索引
          */
         //1. BTree管理docs
-        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
+//        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
+        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, false);
         // 2. 构造索引层
         //索引文件管理器，磁盘
         PropertySet ps = new PropertySet();
@@ -2931,20 +2944,52 @@ public class IRTree extends RTree {
         ps.setProperty("LeafCapacity", fanout);
         ps.setProperty("Dimension", 3);
 
-        // 如果.idx文件已经建立，该值为m_header的页号
-        if(!isCreate)
-            ps.setProperty("IndexIdentifier", 1);
+        // 计算最大时间间隔 和 容纳所有对象的最小矩形边长
+        double minDistance = 0;
+        double maxTime = 0;
+        double x0 = 0, y0 = 0, t0 = 0;
+        if(isCreate) {
+            String line;
+            String[] temp;
+            float time = 0, x1 = 0, y1 = 0, x2, y2;
+            int count = 0;
+            double[] f1 = new double[3];
+            double[] f2 = new double[3];
+            while ((line = reader.readLine()) != null) {
+                temp = line.split(",");
+                time = Float.parseFloat(temp[1]);
+                x1 = Float.parseFloat(temp[2]);
+                y1 = Float.parseFloat(temp[3]);
+                x2 = Float.parseFloat(temp[4]);
+                y2 = Float.parseFloat(temp[5]);
 
+                maxTime = Math.max(maxTime, time);
+                minDistance = Math.max(minDistance, x2 - x1);
+                minDistance = Math.max(minDistance, y2 - y1);
+
+                x0 = Math.min(x0, x1);
+                x0 = Math.min(x0, x2);
+                y0 = Math.min(y0, y1);
+                y0 = Math.min(y0, y2);
+                t0 = Math.min(t0, time);
+            }
+            reader.close();
+            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
+        }
+
+        // 如果.idx文件已经建立，该值为m_header的页号
+        if (!isCreate)
+            ps.setProperty("IndexIdentifier", 1);
+        long start = System.currentTimeMillis();
         IRTree irTree = new IRTree(ps, file, isCreate);
 
-        if(isCreate) {
+        if (isCreate) {
             String line;
             String[] temp;
             int count = 0;
             double[] f1 = new double[3];
             double[] f2 = new double[3];
-            long start = System.currentTimeMillis();
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 temp = line.split(",");
                 int docId = Integer.parseInt(temp[0]);
                 float time = Float.parseFloat(temp[1]);
@@ -2952,12 +2997,15 @@ public class IRTree extends RTree {
                 float y1 = Float.parseFloat(temp[3]);
                 float x2 = Float.parseFloat(temp[4]);
                 float y2 = Float.parseFloat(temp[5]);
-
+                // 归一化 和 数据映射
+                DataCoordinate coordinates = pretreatment(time, x1, y1, x2, y2, maxTime, minDistance, x0, y0, t0, 0.5);
 //                f1[0] = f2[0] = x;
 //                f1[1] = f2[1] = y;
-                f1[0] = x1; f2[0] = x2;
-                f1[1] = y1; f2[1] = y2;
-                f1[2] = f2[2] = time;
+                f1[0] = coordinates.x1;
+                f2[0] = coordinates.x2;
+                f1[1] = coordinates.y1;
+                f2[1] = coordinates.y2;
+                f1[2] = f2[2] = coordinates.time;
                 Region region = new Region(f1, f2);
 
                 byte[] data = new byte[100];
@@ -2965,7 +3013,7 @@ public class IRTree extends RTree {
                 irTree.insertData(data, region, docId);
 
                 count++;
-                if(count % 10000 == 0) System.out.println(count);
+                if (count % 10000 == 0) System.out.println(count);
             }
             irTree.buildInvertedIndex(bs);
 
@@ -2982,20 +3030,55 @@ public class IRTree extends RTree {
 //        for(int i = 0; i < 5; i++) {
 //            qwords.add(rand.nextInt(100));
 //        }
-        qwords.add(121);
-        qwords.add(557);
+        qwords.add(830);
+//        qwords.add(888);
+//        qwords.add(315);
+//        qwords.add(641);
         double[] f = new double[3];
 //        f[0] = rand.nextDouble();
 //        f[1] = rand.nextDouble();
-        f[0] = (0.62 + 0.58 ) / 2;
-        f[1] = (0.59 + 0.464) / 2;
-        f[2] = 0.16;
+        f[0] = (0.07 + 0.1505) / 2;
+        f[1] = (0.9316 + 0.3684) / 2;
+        f[2] = 0.4324;
         Point qp = new Point(f);
         ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
         if (list != null && list.size() > 0)
             System.out.println(list);
         else System.out.println("Nothing has been found");
-        System.err.println(irTree);
+//        System.err.println(irTree);
         irTree.close();
+    }
+
+    public static DataCoordinate pretreatment(double time, double x1, double y1, double x2, double y2,
+                                              double T, double d, double x0, double y0, double t0, double alpha) {
+        assert (alpha >= 0 && alpha <= 1);
+        // 归一化
+        time = (time - t0) / T;
+        x1 = (x1 - x0) / (Math.sqrt(2) * d);
+        y1 = (y1 - y0) / (Math.sqrt(2) * d);
+        x2 = (x2 - x0) / (Math.sqrt(2) * d);
+        y2 = (y2 - y0) / (Math.sqrt(2) * d);
+
+        // 数据映射
+        x1 = alpha * Math.sqrt(2) * x1;
+        y1 = alpha * Math.sqrt(2) * y1;
+        x2 = alpha * Math.sqrt(2) * x2;
+        y2 = alpha * Math.sqrt(2) * y2;
+        time = (1 - alpha) * Math.sqrt(2) * time;
+
+        return new DataCoordinate(time, x1, y1, x2, y2);
+    }
+}
+
+class DataCoordinate {
+    double time;
+    double x1, y1, x2, y2;
+
+    public DataCoordinate(double time, double x1, double y1, double x2, double y2) {
+        this.time = time;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
     }
 }

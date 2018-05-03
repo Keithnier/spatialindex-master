@@ -58,6 +58,7 @@ public abstract class Buffer implements IBuffer
 	IStorageManager m_storageManager = null;
 	HashMap m_buffer = new HashMap();
 	long m_hits = 0;
+	long m_misses = 0;
 
 	abstract void addEntry(int id, Entry entry);
 	abstract void removeEntry();
@@ -83,6 +84,8 @@ public abstract class Buffer implements IBuffer
   	}
 		else
 		{
+			m_misses++;
+
 			ret = m_storageManager.loadByteArray(id);
 			e = new Entry(ret);
 			addEntry(id, e);
@@ -122,6 +125,7 @@ public abstract class Buffer implements IBuffer
 				else
 				{
 					e.m_bDirty = false;
+					m_misses++;
 				}
 			}
 			else
@@ -185,6 +189,9 @@ public abstract class Buffer implements IBuffer
 	public long getHits()
 	{
 		return m_hits;
+	}
+	public long getMisses() {
+		return m_misses;
 	}
 
 	class Entry
