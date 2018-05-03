@@ -2766,7 +2766,7 @@ public class IRTree extends RTree {
                 knearest = first.m_minDist;
 //                if (count > 10) line.add(object_id);
                 line.add(object_id);
-//                System.err.println(String.format("id %d\tscore %f", first.m_pEntry.getIdentifier(), first.m_minDist));
+                System.err.println(String.format("id %d\tscore %f", first.m_pEntry.getIdentifier(), first.m_minDist));
             }
         }
 
@@ -2932,6 +2932,17 @@ public class IRTree extends RTree {
         return ans;
     }
 
+    /**
+     * 构建IRTree索引
+     * @param docsFileName
+     * @param btreeName B树的名字，如btree，用来管理文档
+     * @param indexFileName 索引的名字，如irtree，索引文件
+     * @param fanout
+     * @param buffersize
+     * @param isCreate
+     * @throws Exception
+     * @author Pulin Xie
+     */
     public static void build(String docsFileName, String btreeName, String indexFileName, int fanout, int buffersize, boolean isCreate) throws Exception {
 //        docsFileName = System.getProperty("user.dir") + File.separator + "src" +
 //                File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
@@ -2996,6 +3007,7 @@ public class IRTree extends RTree {
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
                     new FileOutputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")
             ));
+            // 保存计算中间结果到配置文件，后续查询不需要再次计算。
             out.writeDouble(x0);
             out.writeDouble(y0);
             out.writeDouble(t0);
@@ -3064,12 +3076,15 @@ public class IRTree extends RTree {
 
 
         //Query
-        Vector<Integer> qwords = new Vector<Integer>();
+        Vector<Integer> qwords;
         Random rand = new Random();
-//        for(int i = 0; i < 5; i++) {
-//            qwords.add(rand.nextInt(100));
-//        }
-        qwords.add(2043);
+        String[] keys = {
+                "buy", "lol"
+        };
+
+        qwords = Query.findKeyId(keys, Constants.DATA_DIRECTORY + File.separator + "dic1_1.txt");
+
+//        qwords.add(2043);
 //        qwords.add(2231);
 //        qwords.add(711);
 //        qwords.add(719);
@@ -3088,6 +3103,21 @@ public class IRTree extends RTree {
         irTree.close();
     }
 
+    /**
+     * 预处理的类，该类对数据进行预处理操作。
+     * @param time
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param T 给定的时间，默认设置的是给定数据集的最大时间
+     * @param d 归一化处理的最大包含所有数据对象的最小矩形的边长
+     * @param x0
+     * @param y0 给定原点坐标，设置为真实数据中x,y的最小值
+     * @param t0 给定时间，设置为给定时间的最小值
+     * @param alpha 平滑系数
+     * @return
+     */
     public static DataCoordinate pretreatment(double time, double x1, double y1, double x2, double y2,
                                               double T, double d, double x0, double y0, double t0, double alpha) {
         assert (alpha >= 0 && alpha <= 1);
@@ -3109,6 +3139,10 @@ public class IRTree extends RTree {
     }
 }
 
+/**
+ * @description 该类是个辅助类，用来因此返回时空坐标
+ * @author Pulin Xie
+ */
 class DataCoordinate {
     double time;
     double x1, y1, x2, y2;
