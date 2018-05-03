@@ -53,7 +53,8 @@ $RECYCLE.BIN/
 *.lnk
 /.idea/
 
-# 取消不必要文件的提交
+data
+twitter
 bin
 *.db*
 *.id*

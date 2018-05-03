@@ -3,12 +3,13 @@ package spatialindex.rtree;
 import invertedindex.InvertedIndex;
 import neustore.base.FloatData;
 import neustore.base.LRUBuffer;
+import query.Query;
 import spatialindex.spatialindex.*;
 import spatialindex.storagemanager.*;
+import util.Constants;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 public class IRTree extends RTree {
 
@@ -2701,10 +2702,11 @@ public class IRTree extends RTree {
      * 1.从根结点开始，查询倒排索引，找到包含查询关键字的文档id
      * 2.对于所有的子节点，如果包含候选文档id，那么就计算一个得分，存入优先级队列，否则跳过
      * 3.从优先级队列中取出得分最高的结点，如果是内部结点，继续上述过程，否则是外部结点，则其为所求文档
+     *
      * @param qwords 查询关键字集合
      * @param qpoint 查询点坐标
-     * @param topk 查询返回结果个数
-     * @param alpha 空间和文本权重调节系数
+     * @param topk   查询返回结果个数
+     * @param alpha  空间和文本权重调节系数
      * @return 返回查询结果
      * @throws Exception
      */
@@ -2764,7 +2766,7 @@ public class IRTree extends RTree {
                 knearest = first.m_minDist;
 //                if (count > 10) line.add(object_id);
                 line.add(object_id);
-//                System.err.println(String.format("id %d\tscore %f",first.m_pEntry.getIdentifier(), first.m_minDist));
+//                System.err.println(String.format("id %d\tscore %f", first.m_pEntry.getIdentifier(), first.m_minDist));
             }
         }
 
@@ -2774,6 +2776,22 @@ public class IRTree extends RTree {
             return line;
         }
         return null;
+    }
+
+    /**
+     * @param qWords             关键字字符形式
+     * @param qPoint
+     * @param topk
+     * @param alpha
+     * @param dictionaryFilePath
+     * @return
+     * @throws Exception
+     * @description 使用字符形式的关键字查询
+     * @author Pulin Xie
+     */
+    public ArrayList<Integer> findTopK(String[] qWords, Point qPoint, int topk, double alpha, String dictionaryFilePath) throws Exception {
+        Vector<Integer> keysId = Query.findKeyId(qWords, dictionaryFilePath);
+        return Find_AllO_Rank_K(keysId, qPoint, topk, alpha);
     }
 
     public int Find_O_Rank_K(Vector qwords, Point qpoint, int topk, double alpha) throws Exception {
@@ -2915,9 +2933,11 @@ public class IRTree extends RTree {
     }
 
     public static void build(String docsFileName, String btreeName, String indexFileName, int fanout, int buffersize, boolean isCreate) throws Exception {
-        docsFileName = System.getProperty("user.dir") + File.separator + "src" +
-                File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
+//        docsFileName = System.getProperty("user.dir") + File.separator + "src" +
+//                File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
+        docsFileName = Constants.DATA_TEST_DIRECTORY + File.separator + docsFileName;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
         /**
          * 1. 用BTree管理docs文件集
          * 2. 利用docs文件集构建RTree索引层
@@ -2925,7 +2945,7 @@ public class IRTree extends RTree {
          */
         //1. BTree管理docs
 //        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
-        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, false);
+        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
         // 2. 构造索引层
         //索引文件管理器，磁盘
         PropertySet ps = new PropertySet();
@@ -2948,7 +2968,7 @@ public class IRTree extends RTree {
         double minDistance = 0;
         double maxTime = 0;
         double x0 = 0, y0 = 0, t0 = 0;
-        if(isCreate) {
+        if (isCreate) {
             String line;
             String[] temp;
             float time = 0, x1 = 0, y1 = 0, x2, y2;
@@ -2973,8 +2993,27 @@ public class IRTree extends RTree {
                 y0 = Math.min(y0, y2);
                 t0 = Math.min(t0, time);
             }
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
+                    new FileOutputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")
+            ));
+            out.writeDouble(x0);
+            out.writeDouble(y0);
+            out.writeDouble(t0);
+            out.writeDouble(minDistance);
+            out.writeDouble(maxTime);
+            out.flush();
+            out.close();
             reader.close();
-            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
+        } else {
+            DataInputStream in = new DataInputStream(new BufferedInputStream(
+                    new FileInputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")));
+            x0 = in.readDouble();
+            y0 = in.readDouble();
+            t0 = in.readDouble();
+            minDistance = in.readDouble();
+            maxTime = in.readDouble();
+            in.close();
         }
 
         // 如果.idx文件已经建立，该值为m_header的页号
@@ -3030,22 +3069,22 @@ public class IRTree extends RTree {
 //        for(int i = 0; i < 5; i++) {
 //            qwords.add(rand.nextInt(100));
 //        }
-        qwords.add(830);
-//        qwords.add(888);
-//        qwords.add(315);
-//        qwords.add(641);
+        qwords.add(2043);
+//        qwords.add(2231);
+//        qwords.add(711);
+//        qwords.add(719);
         double[] f = new double[3];
-//        f[0] = rand.nextDouble();
-//        f[1] = rand.nextDouble();
-        f[0] = (0.07 + 0.1505) / 2;
-        f[1] = (0.9316 + 0.3684) / 2;
-        f[2] = 0.4324;
+        DataCoordinate coordinates = pretreatment(1523491609241.0, -85.605166, 30.355644, -80.742567, 35.000771, maxTime, minDistance, x0, y0, t0, 0.5);
+        f[0] = (coordinates.x1 + coordinates.x2) / 2;
+        f[1] = (coordinates.y1 + coordinates.y2) / 2;
+        f[2] = coordinates.time;
         Point qp = new Point(f);
+
         ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
         if (list != null && list.size() > 0)
             System.out.println(list);
         else System.out.println("Nothing has been found");
-//        System.err.println(irTree);
+        System.err.println(irTree);
         irTree.close();
     }
 
