@@ -289,3 +289,10 @@ inside regressiontest directory.
             Antonin Guttman, Proc. 1984 ACM-SIGMOD Conference on Management of Data (1985), 47-57.
 [gamma94] "Design Patterns: Elements of Reusable Object-Oriented Software"
           Erich Gamma, Richard Helm, Ralph Johnson and John Vlissides, Addison Wesley. October 1994.
+          
+releaseV2.0
+    支持关键字字符形式的topk检索
+    完整IRTree索引
+    详细索引建立信息
+    数据归一化处理和数据映射
+    支持时间属性
