@@ -214,6 +214,15 @@ public class InvertedIndex extends DBIndex {
         return weight;
     }
 
+    /**
+     * 计算文本相似性得分
+     * 1.对于每一关键字，查询倒排索引是否有该关键字
+     * 2.如果没有，计算下一个关键字；如果有该关键字，将文档id存入hashtable
+     * 3.如果HashTable中已经有该文档id，将其权重相加
+     * @param qwords 关键字集合
+     * @return
+     * @throws IOException
+     */
     public Hashtable textRelevancy(Vector qwords) throws IOException{
 
         Hashtable filter = new Hashtable();
@@ -225,7 +234,7 @@ public class InvertedIndex extends DBIndex {
                 KeyData rec = (KeyData)list.get(i);
                 IntKey docID = (IntKey)rec.key;
                 FloatData weight = (FloatData)rec.data;
-                // 统计文档中关键字出现的次数
+                // 统计文档中所有查询关键字出现的次数，其权重和相加
                 if(filter.containsKey(docID.key)){
                     FloatData w = (FloatData)filter.get(docID.key);
                     w.data  = w.data + weight.data;

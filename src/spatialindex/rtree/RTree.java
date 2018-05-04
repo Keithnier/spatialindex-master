@@ -161,7 +161,7 @@ public class RTree implements ISpatialIndex
 				throw new IllegalStateException("initNew failed with IOException");
 			}
 			Integer i = new Integer(m_headerID);
-			System.err.println(i);
+//			System.err.println(i);
 			ps.setProperty("IndexIdentifier", i);
 		}
 	}
@@ -1015,6 +1015,10 @@ public class RTree implements ISpatialIndex
 
 	public String toString()
 	{
+		if(m_pStorageManager instanceof IBuffer) {
+			m_stats.m_hits = ((IBuffer) m_pStorageManager).getHits();
+			m_stats.m_misses = ((IBuffer) m_pStorageManager).getMisses();
+		}
 		String s = "Dimension: " + m_dimension + "\n"
 						 + "Fill factor: " + m_fillFactor + "\n"
 						 + "Index capacity: " + m_indexCapacity + "\n"
