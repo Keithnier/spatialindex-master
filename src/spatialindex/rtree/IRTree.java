@@ -2947,7 +2947,9 @@ public class IRTree extends RTree {
 //        docsFileName = System.getProperty("user.dir") + File.separator + "src" +
 //                File.separator + "regressiontest" + File.separator + "test3" + File.separator + docsFileName + ".gz";
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(docsFileName))));
-        docsFileName = Constants.DATA_TEST_DIRECTORY + File.separator + docsFileName;
+        String propertiesFile = Constants.PROPERTY_DIRECTORY + File.separator +
+                docsFileName.substring(docsFileName.indexOf("test") + 5, docsFileName.indexOf('.')) + ".properties";
+        docsFileName = Constants.DATA_DIRECTORY + File.separator + docsFileName;
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
         /**
          * 1. 用BTree管理docs文件集
@@ -2955,8 +2957,8 @@ public class IRTree extends RTree {
          * 3. 利用BTree的信息构建倒排索引
          */
         //1. BTree管理docs
+        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, false);
 //        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
-        BtreeStore bs = BtreeStore.process(docsFileName, btreeName, isCreate);
         // 2. 构造索引层
         //索引文件管理器，磁盘
         PropertySet ps = new PropertySet();
@@ -3005,7 +3007,7 @@ public class IRTree extends RTree {
                 t0 = Math.min(t0, time);
             }
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")
+                    new FileOutputStream(propertiesFile)
             ));
             // 保存计算中间结果到配置文件，后续查询不需要再次计算。
             out.writeDouble(x0);
@@ -3019,7 +3021,7 @@ public class IRTree extends RTree {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
         } else {
             DataInputStream in = new DataInputStream(new BufferedInputStream(
-                    new FileInputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")));
+                    new FileInputStream(propertiesFile)));
             x0 = in.readDouble();
             y0 = in.readDouble();
             t0 = in.readDouble();
@@ -3075,30 +3077,31 @@ public class IRTree extends RTree {
         }
 
 
-        //Query
-        Vector<Integer> qwords;
-        Random rand = new Random();
-        String[] keys = {
-                "buy", "lol"
-        };
+//        //Query
+//        Vector<Integer> qwords;
+//        Random rand = new Random();
+//        String[] keys = {
+//                "buy", "lol"
+//        };
+//
+//        qwords = Query.findKeyId(keys, Constants.DATA_DIRECTORY + File.separator + "1day/dic1_1.txt");
+//
+////        qwords.add(2043);
+////        qwords.add(2231);
+////        qwords.add(711);
+////        qwords.add(719);
+//        double[] f = new double[3];
+//        DataCoordinate coordinates = pretreatment(1523491609241.0, -85.605166, 30.355644, -80.742567, 35.000771, maxTime, minDistance, x0, y0, t0, 0.5);
+//        f[0] = (coordinates.x1 + coordinates.x2) / 2;
+//        f[1] = (coordinates.y1 + coordinates.y2) / 2;
+//        f[2] = coordinates.time;
+//        Point qp = new Point(f);
+//
+//        ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
+//        if (list != null && list.size() > 0)
+//            System.out.println(list);
+//        else System.out.println("Nothing has been found");
 
-        qwords = Query.findKeyId(keys, Constants.DATA_DIRECTORY + File.separator + "dic1_1.txt");
-
-//        qwords.add(2043);
-//        qwords.add(2231);
-//        qwords.add(711);
-//        qwords.add(719);
-        double[] f = new double[3];
-        DataCoordinate coordinates = pretreatment(1523491609241.0, -85.605166, 30.355644, -80.742567, 35.000771, maxTime, minDistance, x0, y0, t0, 0.5);
-        f[0] = (coordinates.x1 + coordinates.x2) / 2;
-        f[1] = (coordinates.y1 + coordinates.y2) / 2;
-        f[2] = coordinates.time;
-        Point qp = new Point(f);
-
-        ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
-        if (list != null && list.size() > 0)
-            System.out.println(list);
-        else System.out.println("Nothing has been found");
         System.err.println(irTree);
         irTree.close();
     }
