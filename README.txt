@@ -290,3 +290,5 @@ inside regressiontest directory.
 [gamma94] "Design Patterns: Elements of Reusable Object-Oriented Software"
           Erich Gamma, Richard Helm, Ralph Johnson and John Vlissides, Addison Wesley. October 1994.
 
+V3.0
+    划分时间区间，建立多个IRTree
