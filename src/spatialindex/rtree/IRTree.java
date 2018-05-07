@@ -3005,7 +3005,7 @@ public class IRTree extends RTree {
                 t0 = Math.min(t0, time);
             }
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")
+                    new FileOutputStream(Constants.PROPERTY_FILE)
             ));
             // 保存计算中间结果到配置文件，后续查询不需要再次计算。
             out.writeDouble(x0);
@@ -3019,7 +3019,7 @@ public class IRTree extends RTree {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
         } else {
             DataInputStream in = new DataInputStream(new BufferedInputStream(
-                    new FileInputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")));
+                    new FileInputStream(Constants.PROPERTY_FILE)));
             x0 = in.readDouble();
             y0 = in.readDouble();
             t0 = in.readDouble();
