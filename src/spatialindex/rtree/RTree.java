@@ -1031,6 +1031,7 @@ public class RTree implements ISpatialIndex
 				 + "Split distribution factor: " + m_splitDistributionFactor + "\n";
 		}
 
+
 		s += "Utilization: " + 100 * m_stats.getNumberOfData() / (m_stats.getNumberOfNodesInLevel(0) * m_leafCapacity) + "%" + "\n"
 			 + m_stats;
 

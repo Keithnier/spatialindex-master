@@ -2771,7 +2771,7 @@ public class IRTree extends RTree {
         }
 
 
-        if (count == topk) {
+        if (line.size() > 0) {
             m_stats.m_queryResults = line.size();
             return line;
         }
@@ -3005,7 +3005,7 @@ public class IRTree extends RTree {
                 t0 = Math.min(t0, time);
             }
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(Constants.PROPERTY_FILE)
+                    new FileOutputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")
             ));
             // 保存计算中间结果到配置文件，后续查询不需要再次计算。
             out.writeDouble(x0);
@@ -3019,7 +3019,7 @@ public class IRTree extends RTree {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(docsFileName)));
         } else {
             DataInputStream in = new DataInputStream(new BufferedInputStream(
-                    new FileInputStream(Constants.PROPERTY_FILE)));
+                    new FileInputStream(Constants.PROPERTY_DIRECTORY + File.separator + "properties")));
             x0 = in.readDouble();
             y0 = in.readDouble();
             t0 = in.readDouble();
@@ -3136,22 +3136,5 @@ public class IRTree extends RTree {
         time = (1 - alpha) * Math.sqrt(2) * time;
 
         return new DataCoordinate(time, x1, y1, x2, y2);
-    }
-}
-
-/**
- * @description 该类是个辅助类，用来因此返回时空坐标
- * @author Pulin Xie
- */
-class DataCoordinate {
-    double time;
-    double x1, y1, x2, y2;
-
-    public DataCoordinate(double time, double x1, double y1, double x2, double y2) {
-        this.time = time;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
     }
 }

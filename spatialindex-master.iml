@@ -24,5 +24,6 @@
       </library>
     </orderEntry>
     <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
