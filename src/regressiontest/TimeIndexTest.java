@@ -13,6 +13,6 @@ public class TimeIndexTest {
         int fanout = Integer.parseInt(args[2]);
         int buffersize = Integer.parseInt(args[3]);
         // 首次使用，boolean值为true
-        TimeIndex.build(docsFileName, btreeName, fanout, buffersize, false);
+        TimeIndex.build(docsFileName, btreeName, fanout, buffersize, true);
     }
 }
