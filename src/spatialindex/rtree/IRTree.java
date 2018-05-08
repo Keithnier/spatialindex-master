@@ -3076,33 +3076,36 @@ public class IRTree extends RTree {
             if (ret == false) System.err.println("Structure is INVALID!");
         }
 
+        //Query
+        Vector<Integer> qwords;
+        Random rand = new Random();
+        String[] keys = {
+                "buy",
+        };
 
-//        //Query
-//        Vector<Integer> qwords;
-//        Random rand = new Random();
-//        String[] keys = {
-//                "buy", "lol"
-//        };
-//
 //        qwords = Query.findKeyId(keys, Constants.DATA_DIRECTORY + File.separator + "1day/dic1_1.txt");
-//
-////        qwords.add(2043);
-////        qwords.add(2231);
-////        qwords.add(711);
-////        qwords.add(719);
-//        double[] f = new double[3];
-//        DataCoordinate coordinates = pretreatment(1523491609241.0, -85.605166, 30.355644, -80.742567, 35.000771, maxTime, minDistance, x0, y0, t0, 0.5);
-//        f[0] = (coordinates.x1 + coordinates.x2) / 2;
-//        f[1] = (coordinates.y1 + coordinates.y2) / 2;
-//        f[2] = coordinates.time;
-//        Point qp = new Point(f);
-//
-//        ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 10, 0.5);
-//        if (list != null && list.size() > 0)
-//            System.out.println(list);
-//        else System.out.println("Nothing has been found");
 
+        qwords = new Vector<>();
+        qwords.add(128);
+        qwords.add(225);
+        qwords.add(711);
+        qwords.add(719);
+//        qwords.add(186);
+//        qwords.add(152);
+        double[] f = new double[3];
+        DataCoordinate coordinates = pretreatment(1523491609241.0, -85.605166, 30.355644, -80.742567, 35.000771, maxTime, minDistance, x0, y0, t0, 0.5);
+        f[0] = (coordinates.x1 + coordinates.x2) / 2;
+        f[1] = (coordinates.y1 + coordinates.y2) / 2;
+        f[2] = coordinates.time;
+        Point qp = new Point(f);
+        start = System.currentTimeMillis();
+        ArrayList<Integer> list = irTree.Find_AllO_Rank_K(qwords, qp, 80, 0.5);
+        long end = System.currentTimeMillis();
+        if (list != null && list.size() > 0)
+            System.out.println(list);
+        else System.out.println("Nothing has been found");
         System.err.println(irTree);
+        System.err.println("Query Minutes: " + ((end - start) / 1000.0f));
         irTree.close();
     }
 
